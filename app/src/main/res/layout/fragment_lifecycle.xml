@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LifecycleFragment 布局：可视化展示 Fragment 生命周期 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#E3F2FD">
+
+    <!-- Fragment 标题 -->
+    <TextView
+        android:id="@+id/tv_lifecycle_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="生命周期观察 Fragment"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1565C0"/>
+
+    <!-- 创建次数计数器 -->
+    <TextView
+        android:id="@+id/tv_create_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创建次数：0"
+        android:textSize="18sp"
+        android:textColor="#D32F2F"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"/>
+
+    <!-- ★ 生命周期日志区 —— 每个回调触发时追加一行 -->
+    <!-- ScrollView 确保日志多时可以滚动查看 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"
+        android:background="#FFFFFF"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_lifecycle_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="生命周期日志：\n等待启动..."
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:lineSpacingExtra="4dp"/>
+
+    </ScrollView>
+
+</LinearLayout>

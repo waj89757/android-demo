@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnDialog: Button
     private lateinit var btnBundle: Button
     private lateinit var btnFragment: Button
+    private lateinit var btnViewPager: Button
+    private lateinit var btnNetwork: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -71,6 +73,8 @@ class MainActivity : AppCompatActivity() {
         btnBundle = findViewById(R.id.btn_bundle)
 
         btnFragment = findViewById(R.id.btn_fragment)
+        btnViewPager = findViewById(R.id.btn_viewpager)
+        btnNetwork = findViewById(R.id.btn_network)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -123,6 +127,18 @@ class MainActivity : AppCompatActivity() {
         // ★ Fragment 演示跳转
         btnFragment.setOnClickListener {
             val intent = Intent(this, FragmentDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ ViewPager2 演示跳转
+        btnViewPager.setOnClickListener {
+            val intent = Intent(this, ViewPagerDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ 网络请求演示跳转
+        btnNetwork.setOnClickListener {
+            val intent = Intent(this, NetworkDemoActivity::class.java)
             startActivity(intent)
         }
 

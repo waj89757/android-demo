@@ -45,8 +45,19 @@ dependencies {
 
     // 列表控件
     implementation(libs.androidx.recyclerview)
-    implementation(libs.mediation.test.suite)
+    // ★ ViewPager2 + Fragment 滑动切换页面
+    implementation(libs.androidx.viewpager2)
 
+    // ★ 网络请求：Retrofit + OkHttp + Gson
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+
+    // ★ Kotlin 协程（异步编程，网络请求必须在子线程）
+    implementation(libs.kotlinx.coroutines.android)
+
+    // ★ Lifecycle KTX（提供 lifecycleScope，在 Activity 里启动协程）
+    implementation(libs.lifecycle.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- FragmentDemoActivity 的布局 -->
+<!-- FragmentDemoActivity 布局：支持 Replace/ShowHide 双模式 + 生命周期 Tab -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,12 +16,58 @@
         android:textStyle="bold"
         android:textColor="#333333"/>
 
-    <!-- 切换按钮区 -->
+    <!-- ★ 模式切换区：Replace模式 vs Show/Hide模式 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="切换模式："
+            android:textSize="16sp"
+            android:textColor="#555555"/>
+
+        <Button
+            android:id="@+id/btn_mode_replace"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Replace模式"
+            android:textSize="14sp"
+            android:backgroundTint="#F44336"/>
+
+        <Button
+            android:id="@+id/btn_mode_show_hide"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Show/Hide模式"
+            android:textSize="14sp"
+            android:backgroundTint="#4CAF50"/>
+
+        <!-- 当前模式提示 -->
+        <TextView
+            android:id="@+id/tv_current_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前：Replace"
+            android:textSize="14sp"
+            android:textColor="#F44336"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp"/>
+
+    </LinearLayout>
+
+    <!-- Tab 按钮区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
 
         <Button
             android:id="@+id/btn_tab_home"
@@ -37,7 +83,14 @@
             android:layout_weight="1"
             android:text="个人主页"/>
 
-        <!-- ★ 返回主页按钮 -->
+        <Button
+            android:id="@+id/btn_tab_lifecycle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="★生命周期"
+            android:backgroundTint="#1565C0"/>
+
         <Button
             android:id="@+id/btn_back_main"
             android:layout_width="0dp"
@@ -49,12 +102,10 @@
     </LinearLayout>
 
     <!-- ★ FragmentContainerView —— Fragment 的宿主容器 -->
-    <!-- FragmentManager 会把 Fragment 的布局填充到这个容器里 -->
-    <!-- 这是现代 Android 推荐的方式，替代了旧的 FrameLayout -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginTop="10dp"/>
 
 </LinearLayout>
