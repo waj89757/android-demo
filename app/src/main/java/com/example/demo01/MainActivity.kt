@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnJump: Button
     private lateinit var btnDialog: Button
     private lateinit var btnBundle: Button
+    private lateinit var btnFragment: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -69,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         btnDialog = findViewById(R.id.btn_dialog)
         btnBundle = findViewById(R.id.btn_bundle)
 
+        btnFragment = findViewById(R.id.btn_fragment)
+
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
         textAdapter = MyTextAdapter(initData)
@@ -115,6 +118,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SecondActivity::class.java)
             intent.putExtras(bundle)  // 把整个 Bundle 放进 Intent
             bundleLauncher.launch(intent)
+        }
+
+        // ★ Fragment 演示跳转
+        btnFragment.setOnClickListener {
+            val intent = Intent(this, FragmentDemoActivity::class.java)
+            startActivity(intent)
         }
 
         btnDialog.setOnClickListener {
