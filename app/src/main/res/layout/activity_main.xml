@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#F8F9FA">
+
+    <!-- 页面主标题 -->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="后端安卓客户端练习"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 文字输入框 -->
+    <EditText
+        android:id="@+id/et_input"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="请输入任意内容"
+        android:textSize="16sp"
+        android:inputType="text"
+        android:background="@drawable/edit_bg"
+        android:paddingHorizontal="15dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp"/>
+
+    <!-- 确认展示按钮 -->
+    <Button
+        android:id="@+id/btn_show"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="展示输入内容"
+        app:layout_constraintTop_toBottomOf="@id/et_input"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="30dp"/>
+
+    <!-- 清空内容按钮 -->
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="清空输入"
+        app:layout_constraintTop_toBottomOf="@id/et_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"/>
+
+    <!-- 页面跳转按钮 -->
+    <Button
+        android:id="@+id/btn_jump"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳转到第二个页面并传值"
+        app:layout_constraintTop_toBottomOf="@id/btn_show"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="30dp"/>
+
+    <!-- Bundle 传值按钮 -->
+    <Button
+        android:id="@+id/btn_bundle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="用 Bundle 传多个值跳转"
+        app:layout_constraintTop_toBottomOf="@id/btn_jump"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btn_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="弹出确认对话框"
+        app:layout_constraintTop_toBottomOf="@id/btn_jump"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"/>
+
+    <!-- 列表控件 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_list"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:layout_constraintTop_toBottomOf="@id/btn_dialog"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
