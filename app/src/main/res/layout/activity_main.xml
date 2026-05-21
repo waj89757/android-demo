@@ -107,6 +107,33 @@
             android:backgroundTint="#FF6F00"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ ViewModel + LiveData 演示按钮 -->
+        <Button
+            android:id="@+id/btn_viewmodel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ViewModel + LiveData（旋转不丢数据）"
+            android:backgroundTint="#4CAF50"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ LiveData 对比实验按钮 -->
+        <Button
+            android:id="@+id/btn_livedata_compare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LiveData 对比实验（旋转屏幕看效果）"
+            android:backgroundTint="#9C27B0"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ MVP 架构演示按钮 -->
+        <Button
+            android:id="@+id/btn_mvp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="MVP 架构 Demo（Contract+Presenter）"
+            android:backgroundTint="#E65100"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

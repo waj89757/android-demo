@@ -19,6 +19,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnFragment: Button
     private lateinit var btnViewPager: Button
     private lateinit var btnNetwork: Button
+    private lateinit var btnViewModel: Button
+    private lateinit var btnLiveDataCompare: Button
+    private lateinit var btnMvp: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -75,6 +78,9 @@ class MainActivity : AppCompatActivity() {
         btnFragment = findViewById(R.id.btn_fragment)
         btnViewPager = findViewById(R.id.btn_viewpager)
         btnNetwork = findViewById(R.id.btn_network)
+        btnViewModel = findViewById(R.id.btn_viewmodel)
+        btnLiveDataCompare = findViewById(R.id.btn_livedata_compare)
+        btnMvp = findViewById(R.id.btn_mvp)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -139,6 +145,24 @@ class MainActivity : AppCompatActivity() {
         // ★ 网络请求演示跳转
         btnNetwork.setOnClickListener {
             val intent = Intent(this, NetworkDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ ViewModel + LiveData 演示跳转
+        btnViewModel.setOnClickListener {
+            val intent = Intent(this, ViewModelDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ LiveData 对比实验跳转
+        btnLiveDataCompare.setOnClickListener {
+            val intent = Intent(this, LiveDataCompareActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ MVP 架构演示跳转
+        btnMvp.setOnClickListener {
+            val intent = Intent(this, MvpDemoActivity::class.java)
             startActivity(intent)
         }
 

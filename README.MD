@@ -50,7 +50,45 @@ ViewHolder 优化原理
 同包下直接使用自动生成的R类引用布局、资源文件，无需手动导入 R 类。
 入门阶段优先使用传统标准适配器写法，规避简化语法带来的类引用、方法找不到等报错。
 日常开发使用List集合模拟后端接口返回数据，贴合真实项目业务场景。
-六、整体学习业务主线
-页面路由跳转 → 跨页面双向数据传递 → 客户端交互弹窗设计 → 批量数据流列表渲染
+六、ViewModel + LiveData 数据层架构
+
+ViewModel 的本质
+ViewModel 是一个生命周期比 Activity 更长的数据容器。Activity 因屏幕旋转等原因销毁重建时，ViewModel 不会销毁，持有的数据完整保留。
+通过 ViewModelProvider(this).get(XxxViewModel::class.java) 获取实例，系统保证同一个 Activity 拿到的是同一个对象。
+ViewModel 只负责存储数据和业务逻辑，不持有任何 View 引用，不做 UI 操作。
+
+LiveData 的本质
+LiveData 是一个"带自动通知能力的变量"。它的底层原理等价于 Python 的 @property setter：
+
+    给 LiveData 赋值（_count.value = 5）时，setter 被拦截，
+    框架自动遍历观察者列表，依次调用每个 observe() 注册的回调 lambda，
+    无需手动刷新 UI。
+
+    类比 Python：
+    @value.setter
+    def value(self, new_val):
+        self._value = new_val
+        for callback in self._observers:  # 遍历所有注册的回调
+            callback(new_val)             # 挨个调用
+
+MutableLiveData vs LiveData 的分工
+MutableLiveData：ViewModel 内部使用，可读可写，用 private 修饰，外部无法直接赋值。
+LiveData：对外暴露，只读，Activity 只能 observe() 监听变化，不能主动写入。
+这是标准的"内部 private setter + 外部 public getter"设计，防止外部随意修改数据状态。
+
+observe() 的两种触发时机
+第一种（主动触发）：ViewModel 调用 _count.value = 新值，赋值操作立即触发，当前帧内同步执行回调。
+第二种（被动推送）：Activity 因旋转销毁重建，新 Activity 重新 observe() 时，LiveData 将当前最新值主动推送给新 Activity，UI 自动恢复，无需任何额外代码。
+
+Lifecycle 感知原理（为什么后台不收通知）
+LiveData 不会通知处于后台的 Activity，防止内存泄漏和无效 UI 刷新。
+实现方式：AppCompatActivity 内部由 Google 框架注入了一个透明的 ReportFragment，专门感知宿主 Activity 的生命周期事件，只在 Activity 处于 STARTED 或 RESUMED 状态时执行通知，其余状态暂存新值，等 Activity 回到前台再补发。
+
+MVVM 数据流向
+用户操作 → View（Activity）调用 ViewModel 方法 → ViewModel 修改 LiveData 值
+  → LiveData setter 触发 → 回调 Activity 的 observe lambda → UI 更新。
+Activity 只做两件事：触发 ViewModel 方法、在 observe 回调里刷新 UI，不做任何业务逻辑判断。
+
+七、整体学习业务主线
+页面路由跳转 → 跨页面双向数据传递 → 客户端交互弹窗设计 → 批量数据流列表渲染 → 网络请求（Retrofit + 协程）→ ViewModel + LiveData 数据层架构
 以上知识点为 Android 入门刚需核心技能，覆盖绝大多数 APP 首页、数据列表页、功能选择页基础开发逻辑。
-你直接全选复制，粘贴到记事本改后缀为 .md 即可使用。

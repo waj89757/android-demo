@@ -29,6 +29,15 @@
             android:name=".NetworkDemoActivity"
             android:exported="false" />
         <activity
+            android:name=".ViewModelDemoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LiveDataCompareActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MvpDemoActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

@@ -59,7 +59,13 @@ dependencies {
     // ★ Lifecycle KTX（提供 lifecycleScope，在 Activity 里启动协程）
     implementation(libs.lifecycle.runtime.ktx)
 
+    // ★ ViewModel + LiveData（数据管理与生命周期感知）
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.livedata.ktx)
+
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.arch.core.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
