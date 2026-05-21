@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMvp: Button
     private lateinit var btnDeepLink: Button
     private lateinit var btnAms: Button
+    private lateinit var btnService: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -85,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         btnMvp = findViewById(R.id.btn_mvp)
         btnDeepLink = findViewById(R.id.btn_deeplink)
         btnAms = findViewById(R.id.btn_ams)
+        btnService = findViewById(R.id.btn_service)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -186,6 +188,12 @@ class MainActivity : AppCompatActivity() {
         // ★ AMS 信息展示跳转
         btnAms.setOnClickListener {
             val intent = Intent(this, AmsDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ Service 演示跳转
+        btnService.setOnClickListener {
+            val intent = Intent(this, ServiceDemoActivity::class.java)
             startActivity(intent)
         }
 

@@ -152,6 +152,15 @@
             android:backgroundTint="#558B2F"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ Service 演示按钮 -->
+        <Button
+            android:id="@+id/btn_service"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Service Demo（模拟推送服务）"
+            android:backgroundTint="#4527A0"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"
