@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DeepLink 目标页面"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="如果你看到这个页面，说明 DeepLink 跳转成功了！"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 触发来源 -->
+    <TextView
+        android:id="@+id/tv_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="触发来源：检测中..."
+        android:textSize="16sp"
+        android:textColor="#1565C0"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="30dp"/>
+
+    <!-- 解析出的完整 URL -->
+    <TextView
+        android:id="@+id/tv_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="完整 URL：-"
+        android:textSize="14sp"
+        android:textColor="#333333"
+        android:layout_marginTop="20dp"
+        android:background="#FFFFFF"
+        android:padding="15dp"/>
+
+    <!-- 解析出的参数 -->
+    <TextView
+        android:id="@+id/tv_params"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="解析出的参数：-"
+        android:textSize="14sp"
+        android:textColor="#333333"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF"
+        android:padding="15dp"/>
+
+    <!-- URL 各部分说明 -->
+    <TextView
+        android:id="@+id/tv_url_parts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="URL 结构解析：-"
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:layout_marginTop="10dp"
+        android:background="#E8F5E9"
+        android:padding="15dp"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#F44336"
+        android:layout_marginTop="30dp"/>
+
+</LinearLayout>

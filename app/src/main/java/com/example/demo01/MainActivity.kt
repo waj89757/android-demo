@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnViewModel: Button
     private lateinit var btnLiveDataCompare: Button
     private lateinit var btnMvp: Button
+    private lateinit var btnDeepLink: Button
+    private lateinit var btnAms: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -81,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         btnViewModel = findViewById(R.id.btn_viewmodel)
         btnLiveDataCompare = findViewById(R.id.btn_livedata_compare)
         btnMvp = findViewById(R.id.btn_mvp)
+        btnDeepLink = findViewById(R.id.btn_deeplink)
+        btnAms = findViewById(R.id.btn_ams)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -163,6 +167,25 @@ class MainActivity : AppCompatActivity() {
         // ★ MVP 架构演示跳转
         btnMvp.setOnClickListener {
             val intent = Intent(this, MvpDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ DeepLink 演示跳转 —— 用隐式 Intent 模拟外部触发
+        //
+        // 真实场景：用户在微信/浏览器/Push 里点了一个链接
+        //           Android 系统查路由表，找到我们 App 能处理这个 URL
+        //           系统启动 DeepLinkDemoActivity，intent.data = 这个 URI
+        //
+        // 这里模拟：App 内部构造同样的隐式 Intent，效果等价
+        btnDeepLink.setOnClickListener {
+            val uri = android.net.Uri.parse("demo01://post?id=888&title=DeepLink学习Demo")
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
+        }
+
+        // ★ AMS 信息展示跳转
+        btnAms.setOnClickListener {
+            val intent = Intent(this, AmsDemoActivity::class.java)
             startActivity(intent)
         }
 

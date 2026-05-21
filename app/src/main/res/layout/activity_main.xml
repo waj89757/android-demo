@@ -134,6 +134,24 @@
             android:backgroundTint="#E65100"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ DeepLink 演示按钮 -->
+        <Button
+            android:id="@+id/btn_deeplink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DeepLink Demo（模拟外部链接跳转）"
+            android:backgroundTint="#00838F"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ AMS 信息展示按钮 -->
+        <Button
+            android:id="@+id/btn_ams"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AMS Demo（进程/内存/返回栈）"
+            android:backgroundTint="#558B2F"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"
