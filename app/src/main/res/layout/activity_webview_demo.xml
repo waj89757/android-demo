@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#ECEFF1">
+
+    <!-- Native 区域（顶部标题栏） -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="★ 这里是 Native 区域"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#B71C1C"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <!-- Native 按钮：主动给 H5 发消息 -->
+    <Button
+        android:id="@+id/btn_send_to_js"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Native → JS：发送当前时间"
+        android:backgroundTint="#B71C1C"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 分割线 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="↓ 下方是 WebView（内嵌 H5）↓"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:gravity="center"
+        android:paddingVertical="6dp"/>
+
+    <!-- WebView 区域（H5 世界） -->
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

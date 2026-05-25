@@ -91,4 +91,207 @@ Activity 只做两件事：触发 ViewModel 方法、在 observe 回调里刷新
 
 七、整体学习业务主线
 页面路由跳转 → 跨页面双向数据传递 → 客户端交互弹窗设计 → 批量数据流列表渲染 → 网络请求（Retrofit + 协程）→ ViewModel + LiveData 数据层架构
-以上知识点为 Android 入门刚需核心技能，覆盖绝大多数 APP 首页、数据列表页、功能选择页基础开发逻辑。
+
+八、AMS（ActivityManagerService）
+
+AMS 的本质
+AMS 是 system_server 进程里最核心的系统服务，类比 Kubernetes 控制面：决定 Activity 在哪个进程跑、何时销毁、返回栈如何管理。
+
+AMS 管四件事：
+- Activity 生命周期：onCreate/onPause/onResume 等回调全部由 AMS 通过 Binder 发指令，App 执行
+- Task 返回栈：维护 Activity 导航历史，Back 键弹栈，多任务切换时整个 Task 移到前后台
+- 进程管理（OOM adj）：给进程打分，内存不足时按分数从高到低杀进程
+- Service / Broadcast 生命周期调度
+
+OOM adj 优先级（分越低越难被杀）：
+- 0：前台 Activity（用户正在使用）
+- 200：Foreground Service（音乐播放等）
+- 500：后台 Service
+- 900：后台 Activity（用户切走的 App）
+- 1000：空进程
+
+App 影响 AMS 的合法手段：
+- android:largeHeap="true"：申请更大堆内存（默认256MB → 512MB）
+- startForeground()：提升进程优先级到 OOM adj=200，必须显示持久通知
+- onTrimMemory()：响应 AMS 的内存警告，主动释放缓存
+- WorkManager：让 AMS 在合适时机（充电/联网）调度后台任务
+- START_STICKY：Service 被杀后 AMS 自动重建
+
+九、Service
+
+Service 的本质
+Service 是没有界面的后台组件，默认和 Activity 在同一进程的同一主线程，生命周期独立于 Activity。
+
+两种启动方式：
+- startService：一次性启动，Service 自己 stopSelf() 或外部 stopService() 才结束，适合下载、上传日志
+- bindService：引用计数管理，最后一个调用 unbindService() 时 AMS 自动销毁，适合音乐播放控制
+
+Service 和进程的关系：
+- 默认同进程（不加 android:process 属性）
+- android:process=":push" 开独立进程，适合崩溃隔离、突破内存上限、保活，代价是内存翻倍且跨进程通信要 AIDL
+
+独立进程适用场景：
+- 崩溃隔离：WebView 进程崩了不影响主进程
+- 突破内存上限：图片处理等大内存场景
+- 推送保活：国内无 FCM，推送进程常驻接收消息
+- 权限隔离：不同进程持有不同敏感权限
+
+十、FCM 与保活
+
+保活的目的
+让 App 进程在用户不使用时依然存活，持续接收服务端推来的实时消息（即时消息、直播弹幕等）。
+
+FCM（Firebase Cloud Messaging）
+Google 全球推送服务，长连接维护在 Google Play Services（系统进程）而非 App 进程。App 进程死了，GPS 依然帮你接收消息，消息到达后再唤醒 App 处理。海外 App 标配，免费零运维。
+
+国内无法用 FCM 的原因：国内手机无 Google Play Services，且 Google 服务器被封锁。
+国内方案：接入厂商推送（小米/华为/OPPO）或自建长连接 + Foreground Service 保活。
+
+App 不能永久存活：系统在架构层面拒绝，OOM adj 机制是系统主权，双进程互保等黑科技被 Android 8.0+ 逐步封堵。
+
+十一、Handler / Looper
+
+核心概念
+Handler/Looper 是 Android 的线程通信基础设施，本质是事件循环（Event Loop），等价于 Node.js 的 Event Loop。
+
+三个角色：
+- Looper：事件循环，while(true) 从 MessageQueue 取任务执行，没有任务时阻塞等待
+- MessageQueue：任务队列，存放待执行的 Message/Runnable
+- Handler：投递者+执行者，post()/sendMessage() 往队列投任务，Looper 取出后调 Handler 执行
+
+主线程天然有 Looper（系统在 ActivityThread.main() 里创建）；子线程默认没有 Looper，需要用 HandlerThread。
+
+两种线程：
+- 普通 Thread：一次性任务，执行完销毁
+- HandlerThread：自带 Looper 的子线程，可持续接收任务，调 quitSafely() 才结束
+
+常用 API：
+- mainHandler.post{}：子线程把"更新 UI"的任务投到主线程执行
+- postDelayed(runnable, 1000)：延迟1秒后执行
+- removeCallbacks(runnable)：撤销还未执行的任务
+
+协程/LiveData 底层都依赖 Handler，withContext(Dispatchers.Main) 内部就是 Handler.post()。
+
+十二、UI 只能主线程操作
+
+铁律：子线程修改 View → 崩溃：CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+
+原因三层：
+1. View 树是无锁数据结构，多线程并发修改产生竞态，加锁代价太高（60fps每秒数千次操作）
+2. Vsync 驱动的 measure/layout/draw 必须串行在主线程执行
+3. 所有 GUI 框架的共同设计（iOS/Flutter/Web DOM 都一样）
+
+切回主线程的方法（效果等价）：
+- mainHandler.post { textView.text = "x" }
+- textView.post { textView.text = "x" }
+- runOnUiThread { textView.text = "x" }
+
+十三、SurfaceFlinger 与渲染机制
+
+SurfaceFlinger 的本质
+SurfaceFlinger 是 Android 的系统级合成器进程，把屏幕上所有 App 的图层（Surface）按 Z 轴顺序合成成最终一帧画面，送给屏幕显示。你看到的屏幕 = 状态栏图层 + App 内容图层 + 导航栏图层 + 壁纸图层的叠加。
+
+核心概念：
+- Surface：内存缓冲区（图层数据），SurfaceFlinger 直接操作，App 写入后通过 BufferQueue 传递
+- SurfaceView：Android View 控件，内部持有独立 Surface（独立图层），可在子线程绘制
+- Vsync：硬件每 16.67ms（60fps）发一次信号，驱动 Choreographer 触发主线程 measure/layout/draw
+
+普通 View vs SurfaceView：
+
+| | 普通 View | SurfaceView |
+|---|---|---|
+| 刷新触发 | 被动，等 Vsync | 主动，子线程随时画 |
+| 绘制线程 | 主线程 | 子线程 |
+| 帧率控制 | 系统控制（最多60fps） | 自己控制（sleep 决定） |
+| 用途 | 普通 UI 控件 | 视频、游戏、摄像头预览 |
+
+SurfaceView 渲染三步：
+1. lockCanvas()：从 BufferQueue 取一块空闲 Buffer 作为画布
+2. 在画布上绘制内容
+3. unlockCanvasAndPost()：提交这帧到 BufferQueue，等 SurfaceFlinger 合成
+
+帧率说明：
+- 60fps = 16.67ms/帧，90fps = 11.11ms/帧，120fps = 8.33ms/帧
+- 画太快（无限制）：SurfaceFlinger 丢多余帧，只显示屏幕刷新率对应的帧，白耗电
+- 画太慢（30fps）：用户感觉卡顿
+
+十四、整体学习路线（更新）
+页面路由跳转 → 数据传递 → 弹窗交互 → 列表渲染 → 网络请求 → ViewModel/LiveData → MVP → DeepLink → Android 系统架构（Zygote → Binder → AMS → Service → Handler/Looper → SurfaceFlinger）
+
+十五、Canvas
+
+Canvas 是什么
+绘图指令的 API 层，提供 drawCircle/drawText/drawBitmap 等方法，底层由 Skia（C++ 图形库）执行，把指令翻译成像素写入绑定的 Bitmap 或 Surface Buffer。
+
+Canvas 不存像素，只是指挥官；Skia 才真正写像素；SurfaceFlinger 把 Buffer 合成到屏幕。
+
+Canvas 必须依附画纸：
+- 依附 Bitmap：Canvas(bitmap)，结果写入内存图片
+- 依附 Surface：surfaceHolder.lockCanvas()，结果进入 BufferQueue
+- 依附 View：系统在 onDraw(canvas) 里自动绑定，最常用
+
+Paint 是搭档：Canvas 决定"画什么形状"，Paint 决定"怎么画"（颜色/描边/渐变/抗锯齿）。
+
+坐标系：原点在左上角，x 向右，y 向下。
+
+自定义 View：重写 onDraw(canvas)，调 invalidate() 触发下一帧重绘。
+
+十六、BroadcastReceiver
+
+本质：事件总线的订阅者，类比 Redis Pub/Sub。发送者发广播，所有注册了匹配 IntentFilter 的 Receiver 都能收到，双方互不知道对方是谁。
+
+工作原理：
+发送方 sendBroadcast(intent) → AMS 查所有匹配的 Receiver → 逐个调用 onReceive()（主线程，10秒内完成，超时 ANR）
+
+两类广播：
+- 系统广播：AMS 发出（网络变化/开机/充电等），跨进程 Binder 调用
+- App 内广播：LocalBroadcastManager，同进程，不过 Binder，更安全更快
+
+两种注册：
+- 静态注册（Manifest）：App 未启动也能收（开机广播）
+- 动态注册（代码）：Activity/Service 存活时才收，onDestroy 必须 unregisterReceiver，否则内存泄漏
+
+大厂场景：
+- 退出登录通知所有页面清空数据
+- Push 消息到达通知当前页面刷新
+- 下载进度广播
+
+注意：Google 已将 LocalBroadcastManager 标记为 deprecated，现代替代方案是 LiveData / SharedFlow。
+
+十七、ContentProvider
+
+本质：跨进程数据共享的标准接口，类比 REST API。把私有数据库包装成 URI + CRUD 的形式对外暴露，底层走 Binder + 共享内存，用权限系统控制谁能访问。
+
+URI 结构（类似 URL）：
+content://com.example.myapp/notes/1
+  └── scheme  └── authority（类似域名）  └── path + id
+
+五个标准操作（对应 REST）：
+- query()   → GET
+- insert()  → POST
+- update()  → PUT
+- delete()  → DELETE
+- getType() → 返回 MIME 类型
+
+URI → Provider 的寻址过程：
+1. 解析 URI 中的 authority（com.example.myapp）
+2. AMS 在系统注册表（App 安装时写入）里找到对应的 ContentProvider 类名
+3. Binder 调用目标进程的 Provider 方法，返回 Cursor
+
+必须在 Manifest 注册，authority 全局唯一，类似域名，不注册则 IllegalArgumentException。
+
+系统内置的 ContentProvider（直接可用）：
+- 联系人：ContactsContract.Contacts.CONTENT_URI
+- 相册：MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+- 短信：content://sms/
+
+大厂场景：
+- 多 App 共享登录 token（快手主站 + 极速版同一账号体系）
+- 插件化架构：插件进程通过 Provider 访问宿主资源
+- FileProvider：App 私有文件安全分享给其他 App（Android 7.0+ 必须用）
+- Jetpack App Startup：SDK 利用 Provider.onCreate() 比 Application.onCreate() 更早的时机自动初始化
+
+十八、整体学习路线（更新）
+页面路由 → 数据传递 → 弹窗 → 列表 → 网络请求 → MVVM（ViewModel/LiveData）→ MVP → DeepLink
+→ 系统架构：Zygote → Binder → AMS → Service → FCM/保活 → Handler/Looper → SurfaceFlinger → Canvas
+→ 四大组件：Activity → Service → BroadcastReceiver → ContentProvider

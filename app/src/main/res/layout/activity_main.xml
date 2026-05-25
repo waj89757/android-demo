@@ -161,6 +161,51 @@
             android:backgroundTint="#4527A0"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ Handler/Looper 演示按钮 -->
+        <Button
+            android:id="@+id/btn_handler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Handler/Looper Demo（线程通信）"
+            android:backgroundTint="#BF360C"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ SurfaceFlinger 演示按钮 -->
+        <Button
+            android:id="@+id/btn_surface"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SurfaceFlinger Demo（子线程渲染弹跳球）"
+            android:backgroundTint="#006064"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ Broadcast 演示按钮 -->
+        <Button
+            android:id="@+id/btn_broadcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Broadcast Demo（网络状态 + 自定义广播）"
+            android:backgroundTint="#37474F"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ ContentProvider 演示按钮 -->
+        <Button
+            android:id="@+id/btn_content_provider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ContentProvider Demo（笔记 + 联系人）"
+            android:backgroundTint="#4E342E"
+            android:layout_marginTop="15dp"/>
+
+        <!-- ★ WebView + JSBridge 演示按钮 -->
+        <Button
+            android:id="@+id/btn_webview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WebView Demo（JSBridge 双向通信）"
+            android:backgroundTint="#1A237E"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

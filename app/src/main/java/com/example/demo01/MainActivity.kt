@@ -25,6 +25,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnDeepLink: Button
     private lateinit var btnAms: Button
     private lateinit var btnService: Button
+    private lateinit var btnHandler: Button
+    private lateinit var btnSurface: Button
+    private lateinit var btnBroadcast: Button
+    private lateinit var btnContentProvider: Button
+    private lateinit var btnWebview: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -87,6 +92,11 @@ class MainActivity : AppCompatActivity() {
         btnDeepLink = findViewById(R.id.btn_deeplink)
         btnAms = findViewById(R.id.btn_ams)
         btnService = findViewById(R.id.btn_service)
+        btnHandler = findViewById(R.id.btn_handler)
+        btnSurface = findViewById(R.id.btn_surface)
+        btnBroadcast = findViewById(R.id.btn_broadcast)
+        btnContentProvider = findViewById(R.id.btn_content_provider)
+        btnWebview = findViewById(R.id.btn_webview)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -194,6 +204,36 @@ class MainActivity : AppCompatActivity() {
         // ★ Service 演示跳转
         btnService.setOnClickListener {
             val intent = Intent(this, ServiceDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ Handler/Looper 演示跳转
+        btnHandler.setOnClickListener {
+            val intent = Intent(this, HandlerDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ SurfaceFlinger 演示跳转
+        btnSurface.setOnClickListener {
+            val intent = Intent(this, SurfaceDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ Broadcast 演示跳转
+        btnBroadcast.setOnClickListener {
+            val intent = Intent(this, BroadcastDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ ContentProvider 演示跳转
+        btnContentProvider.setOnClickListener {
+            val intent = Intent(this, ContentProviderDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ WebView 演示跳转
+        btnWebview.setOnClickListener {
+            val intent = Intent(this, WebViewDemoActivity::class.java)
             startActivity(intent)
         }
 

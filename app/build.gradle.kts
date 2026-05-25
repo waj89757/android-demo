@@ -63,6 +63,9 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.livedata.ktx)
 
+    // ★ LocalBroadcastManager（App 内部广播，不经过 AMS）
+    implementation(libs.localbroadcastmanager)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.arch.core.testing)
