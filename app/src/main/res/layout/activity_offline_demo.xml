@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="离线包 Demo（真实 ZIP 解压 + Manifest 映射）"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#1B5E20"
+        android:gravity="center"
+        android:padding="12dp"/>
+
+    <!-- 操作按钮区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/btn_load_offline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="加载远程 URL\n（会被离线包拦截）"
+            android:backgroundTint="#0D47A1"
+            android:layout_marginEnd="6dp"
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/btn_reinstall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="重新安装\n离线包"
+            android:backgroundTint="#4A148C"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <!-- WebView 展示区 -->
+    <WebView
+        android:id="@+id/web_view_offline"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"/>
+
+    <!-- 日志区（展示 manifest 映射 + 拦截记录）-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:text="日志："
+        android:textSize="11sp"
+        android:textColor="#333"
+        android:padding="4dp"
+        android:background="#F5F5F5"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="#263238">
+
+        <TextView
+            android:id="@+id/tv_offline_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="10sp"
+            android:textColor="#B2EBF2"
+            android:padding="8dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_back_offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="8dp"/>
+
+</LinearLayout>

@@ -3,6 +3,7 @@ package com.example.demo01
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.JavascriptInterface
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
@@ -27,11 +28,51 @@ class WebViewDemoActivity : AppCompatActivity() {
         //    JS 里就可以用 window.NativeBridge.xxx() 调 Native 方法
         webView.addJavascriptInterface(NativeBridge(), "NativeBridge")
 
-        // 3. 设置 WebViewClient，让链接在 WebView 内打开（不跳浏览器）
-        webView.webViewClient = WebViewClient()
+        // 3. 设置 WebViewClient + 离线包拦截
+        webView.webViewClient = object : WebViewClient() {
+
+            /**
+             * ★ shouldInterceptRequest：WebView 每次发网络请求前都会调这里
+             *
+             * 返回 null  → WebView 正常发网络请求
+             * 返回 Response → WebView 直接用这个内容，不发网络请求
+             *
+             * 离线包原理：检查本地有没有对应文件，有就直接返回本地内容
+             */
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: android.webkit.WebResourceRequest
+            ): WebResourceResponse? {
+                val url = request.url.toString()
+
+                // ★ 模拟离线包拦截：
+                // 假设 https://m.example.com/offline/page.html 是要访问的远程页面
+                // 但我们本地有这个文件，直接返回本地内容
+                if (url.contains("m.example.com/offline/page.html")) {
+                    android.util.Log.d("WebView", "★ 拦截到请求：$url → 返回本地离线内容")
+
+                    // 把本地 HTML 字符串包装成 Response 返回
+                    // 实际项目里这里读的是本地文件（解压后的离线包）
+                    val offlineHtml = buildOfflineHtml()
+                    val inputStream = offlineHtml.byteInputStream(Charsets.UTF_8)
+                    return WebResourceResponse("text/html", "UTF-8", inputStream)
+                }
+
+                // 其他请求放行，正常走网络
+                return null
+            }
+        }
 
         // 4. 直接加载 HTML 字符串（最简单，不需要服务器）
         webView.loadDataWithBaseURL(null, buildHtml(), "text/html", "UTF-8", null)
+
+        // ★ 离线包演示按钮：加载一个「假的远程 URL」，但被拦截返回本地内容
+        findViewById<Button>(R.id.btn_offline).setOnClickListener {
+            // 这个 URL 根本不存在（没有真正的服务器）
+            // 但 shouldInterceptRequest 会拦截它，返回本地内容
+            webView.loadUrl("https://m.example.com/offline/page.html")
+            Toast.makeText(this, "尝试加载远程 URL，看看会不会被拦截...", Toast.LENGTH_SHORT).show()
+        }
 
         // ★ Native 主动调 JS：把当前时间注入到 H5 页面
         findViewById<Button>(R.id.btn_send_to_js).setOnClickListener {
@@ -141,8 +182,45 @@ class WebViewDemoActivity : AppCompatActivity() {
     """.trimIndent()
 
     override fun onDestroy() {
-        // 防止内存泄漏：销毁 WebView
+        webView.stopLoading()
         webView.destroy()
         super.onDestroy()
     }
+
+    // 模拟离线包里的本地 HTML 内容
+    private fun buildOfflineHtml() = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: sans-serif; padding: 20px; background: #E8F5E9; }
+                h2 { color: #2E7D32; }
+                .tag {
+                    display: inline-block; background: #2E7D32; color: white;
+                    padding: 4px 12px; border-radius: 20px; font-size: 13px;
+                }
+                p { color: #444; line-height: 1.6; }
+            </style>
+        </head>
+        <body>
+            <span class="tag">★ 离线包内容</span>
+            <h2>这个页面来自本地！</h2>
+            <p>
+                你请求的 URL 是：<br>
+                <code>https://m.example.com/offline/page.html</code>
+            </p>
+            <p>
+                这个域名根本不存在，但 <code>shouldInterceptRequest</code>
+                拦截了请求，返回了本地文件内容。
+            </p>
+            <p>
+                ✅ 没有发出任何网络请求<br>
+                ✅ 加载速度 = 读本地文件<br>
+                ✅ 这就是离线包的核心原理
+            </p>
+        </body>
+        </html>
+    """.trimIndent()
 }

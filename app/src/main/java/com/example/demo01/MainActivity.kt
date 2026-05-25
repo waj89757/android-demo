@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnBroadcast: Button
     private lateinit var btnContentProvider: Button
     private lateinit var btnWebview: Button
+    private lateinit var btnOfflineDemo: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         btnBroadcast = findViewById(R.id.btn_broadcast)
         btnContentProvider = findViewById(R.id.btn_content_provider)
         btnWebview = findViewById(R.id.btn_webview)
+        btnOfflineDemo = findViewById(R.id.btn_offline_demo)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -234,6 +236,12 @@ class MainActivity : AppCompatActivity() {
         // ★ WebView 演示跳转
         btnWebview.setOnClickListener {
             val intent = Intent(this, WebViewDemoActivity::class.java)
+            startActivity(intent)
+        }
+
+        // ★ 离线包演示跳转
+        btnOfflineDemo.setOnClickListener {
+            val intent = Intent(this, OfflineDemoActivity::class.java)
             startActivity(intent)
         }
 

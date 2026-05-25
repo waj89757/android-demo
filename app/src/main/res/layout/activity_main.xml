@@ -206,6 +206,15 @@
             android:backgroundTint="#1A237E"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ 离线包演示按钮 -->
+        <Button
+            android:id="@+id/btn_offline_demo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="离线包 Demo（真实 ZIP 解压 + Manifest 拦截）"
+            android:backgroundTint="#1B5E20"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"
