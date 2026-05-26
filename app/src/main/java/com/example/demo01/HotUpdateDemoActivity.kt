@@ -91,7 +91,9 @@ class HotUpdateDemoActivity : AppCompatActivity() {
 
         // 用 WebView 执行 bundle JS（模拟 RN JS 引擎执行 bundle）
         val html = buildHtmlWrapper(bundleContent)
-        webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+        // ★ baseUrl 必须是 file:// 而不是 null
+        // null 会导致 origin=about:blank，JavascriptInterface 注入失败
+        webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null)
 
         log("✅ Bundle 已加载：$bundleSource")
         log("存储路径：${BundleManager.getBundleDirPath(this)}")
@@ -144,15 +146,92 @@ class HotUpdateDemoActivity : AppCompatActivity() {
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = WebViewClient()
 
-        // ★ BundleBridge：模拟 RN 的 Native Module 回调
-        webView.addJavascriptInterface(object {
-            @JavascriptInterface
-            fun onBundleLoaded(version: String) {
+        // ★ 捕获 JS 控制台日志，帮助调试
+        webView.webChromeClient = object : android.webkit.WebChromeClient() {
+            override fun onConsoleMessage(msg: android.webkit.ConsoleMessage): Boolean {
                 runOnUiThread {
-                    log("📱 Bundle JS 执行完毕，版本 v$version（BundleBridge 回调）")
+                    log("🌐 [JS Console] ${msg.message()} (${msg.sourceId()}:${msg.lineNumber()})")
                 }
+                return true
             }
-        }, "BundleBridge")
+        }
+
+        // ★ BundleBridge：必须是具名内部类，匿名 object{} 反射找不到方法
+        webView.addJavascriptInterface(NativeBridge(), "NativeBridge")
+    }
+
+    /**
+     * ★ 具名内部类：JavascriptInterface 必须用具名类
+     * 匿名 object{} 的方法 Android 反射机制找不到 → "non-injected object" 错误
+     */
+    inner class NativeBridge {
+
+        @JavascriptInterface
+        fun onBundleLoaded(version: String) {
+            runOnUiThread { log("📱 [Native←JS] onBundleLoaded: v$version") }
+        }
+
+        @JavascriptInterface
+        fun getDeviceInfo() {
+            runOnUiThread {
+                log("📱 [Native←JS] getDeviceInfo() 被调用")
+                val info = mapOf(
+                    "model"   to android.os.Build.MODEL,
+                    "brand"   to android.os.Build.BRAND,
+                    "android" to android.os.Build.VERSION.RELEASE,
+                    "sdk"     to android.os.Build.VERSION.SDK_INT.toString(),
+                    "screen"  to "${resources.displayMetrics.widthPixels}x${resources.displayMetrics.heightPixels}",
+                    "density" to resources.displayMetrics.density.toString()
+                )
+                val json = org.json.JSONObject(info).toString()
+                webView.evaluateJavascript("onDeviceInfoReceived($json);", null)
+                log("📱 [Native→JS] evaluateJavascript: onDeviceInfoReceived()")
+            }
+        }
+
+        @JavascriptInterface
+        fun showToast(message: String) {
+            runOnUiThread {
+                log("🔔 [Native←JS] showToast('$message')")
+                android.widget.Toast.makeText(
+                    this@HotUpdateDemoActivity, message, android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        @JavascriptInterface
+        fun trackEvent(eventName: String, paramsJson: String) {
+            runOnUiThread {
+                log("📊 [Native←JS] trackEvent: $eventName | params: $paramsJson")
+            }
+        }
+
+        @JavascriptInterface
+        fun openPage(pageName: String) {
+            runOnUiThread {
+                log("🚀 [Native←JS] openPage('$pageName')")
+                android.widget.Toast.makeText(
+                    this@HotUpdateDemoActivity,
+                    "JS 调用 openPage: $pageName", android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        @JavascriptInterface
+        fun getUserInfo() {
+            runOnUiThread {
+                log("👤 [Native←JS] getUserInfo() 被调用")
+                val userInfo = mapOf(
+                    "userId" to "u_10086",
+                    "name"   to "王安杰",
+                    "role"   to "技术负责人",
+                    "team"   to "海外增长"
+                )
+                val json = org.json.JSONObject(userInfo).toString()
+                webView.evaluateJavascript("onUserInfoReceived($json);", null)
+                log("👤 [Native→JS] evaluateJavascript: onUserInfoReceived()")
+            }
+        }
     }
 
     /**
@@ -170,14 +249,19 @@ class HotUpdateDemoActivity : AppCompatActivity() {
             <div id="app-root"></div>
             <script>
                 $bundleJs
-                // 执行 bundle 里定义的 renderApp 函数
-                renderApp('app-root');
+
+                // ★ 延迟执行，确保 JavascriptInterface 注入完成
+                // Bridge 注入是异步的，直接同步调用会报 non-injected 错误
+                window.addEventListener('load', function() {
+                    renderApp('app-root');
+                });
             </script>
         </body>
         </html>
     """.trimIndent()
 
     private fun log(msg: String) {
+        android.util.Log.d("HotUpdateDemo", msg)   // ★ 同时输出到 Logcat
         runOnUiThread {
             tvLog.append("$msg\n")
         }
