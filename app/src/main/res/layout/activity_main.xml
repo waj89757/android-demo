@@ -215,6 +215,15 @@
             android:backgroundTint="#1B5E20"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ 热更新演示按钮 -->
+        <Button
+            android:id="@+id/btn_hot_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="热更新 Demo（Bundle v1→v2 + 回滚）"
+            android:backgroundTint="#E65100"
+            android:layout_marginTop="15dp"/>
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

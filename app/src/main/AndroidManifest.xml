@@ -131,6 +131,10 @@
             android:name=".OfflineDemoActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".HotUpdateDemoActivity"
+            android:exported="false" />
+
         <!--
         ★★★ ContentProvider 注册 ★★★
         authorities：全局唯一标识，相当于域名，调用方通过它找到这个 Provider
