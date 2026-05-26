@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>餐厅点单 - 纯 JS + HTML</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; background: #f5f5f5; }
+    h2 { color: #333; }
+    .section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+    /* 菜单 */
+    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .menu-item:last-child { border-bottom: none; }
+    .item-name { font-size: 15px; }
+    .item-price { color: #888; font-size: 14px; }
+    .add-btn { background: #FF6B35; color: white; border: none; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; }
+    .add-btn:hover { background: #e55a26; }
+
+    /* 购物车 */
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .cart-item:last-child { border-bottom: none; }
+    .qty-btn { background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; }
+    .qty { margin: 0 10px; font-weight: bold; }
+    .remove-btn { color: #ff4444; background: none; border: none; cursor: pointer; font-size: 13px; }
+
+    /* 统计栏 */
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .stat-box { background: white; border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .stat-num { font-size: 28px; font-weight: bold; color: #FF6B35; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+
+    /* 结算 */
+    .checkout-bar { background: #FF6B35; color: white; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .checkout-bar button { background: white; color: #FF6B35; border: none; border-radius: 8px; padding: 8px 20px; font-weight: bold; cursor: pointer; }
+    .empty-tip { color: #bbb; text-align: center; padding: 20px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <h2>🍜 餐厅点单系统（纯 JS + HTML）</h2>
+
+  <!-- ★ 统计栏：同一份数据要在 3 个地方显示 -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-num" id="stat-count">0</div>
+      <div class="stat-label">已点菜数</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="stat-total">¥0</div>
+      <div class="stat-label">合计金额</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="stat-kinds">0</div>
+      <div class="stat-label">菜品种类</div>
+    </div>
+  </div>
+
+  <!-- 菜单 -->
+  <div class="section">
+    <h3>📋 菜单</h3>
+    <div id="menu-list"></div>
+  </div>
+
+  <!-- 购物车 -->
+  <div class="section">
+    <h3>🛒 已点菜品</h3>
+    <div id="cart-list"><p class="empty-tip">还没有点菜哦</p></div>
+  </div>
+
+  <!-- 结算栏 -->
+  <div class="checkout-bar">
+    <div>
+      共 <span id="checkout-count">0</span> 件 ·
+      合计 <span id="checkout-total">¥0</span>
+    </div>
+    <button onclick="checkout()">去结算</button>
+  </div>
+
+<script>
+  // ============================================================
+  // 数据层：菜单和购物车状态
+  // ============================================================
+  const MENU = [
+    { id: 1, name: '红烧肉', price: 48 },
+    { id: 2, name: '清蒸鱼', price: 68 },
+    { id: 3, name: '宫保鸡丁', price: 38 },
+    { id: 4, name: '炒时蔬', price: 22 },
+    { id: 5, name: '蛋花汤', price: 12 },
+  ]
+
+  // 购物车：{ menuId → quantity }
+  const cart = {}
+
+  // ============================================================
+  // ★★★ 核心问题：每次数据变了，要手动更新 N 个地方 ★★★
+  // ============================================================
+
+  function updateAllUI() {
+    // 计算统计数据
+    let totalCount = 0
+    let totalPrice = 0
+    let kinds = 0
+
+    for (const id in cart) {
+      if (cart[id] > 0) {
+        const item = MENU.find(m => m.id === parseInt(id))
+        totalCount += cart[id]
+        totalPrice += cart[id] * item.price
+        kinds++
+      }
+    }
+
+    // ★ 手动更新显示屏1：顶部统计栏（3个位置）
+    document.getElementById('stat-count').textContent = totalCount
+    document.getElementById('stat-total').textContent = '¥' + totalPrice
+    document.getElementById('stat-kinds').textContent = kinds
+
+    // ★ 手动更新显示屏2：结算栏（2个位置）
+    document.getElementById('checkout-count').textContent = totalCount
+    document.getElementById('checkout-total').textContent = '¥' + totalPrice
+
+    // ★ 手动更新显示屏3：购物车列表（完全重建）
+    const cartEl = document.getElementById('cart-list')
+    if (kinds === 0) {
+      cartEl.innerHTML = '<p class="empty-tip">还没有点菜哦</p>'
+    } else {
+      cartEl.innerHTML = ''
+      for (const id in cart) {
+        if (cart[id] <= 0) continue
+        const item = MENU.find(m => m.id === parseInt(id))
+        const div = document.createElement('div')
+        div.className = 'cart-item'
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <div style="display:flex;align-items:center">
+            <button class="qty-btn" onclick="changeQty(${id}, -1)">−</button>
+            <span class="qty">${cart[id]}</span>
+            <button class="qty-btn" onclick="changeQty(${id}, 1)">+</button>
+            <span style="margin-left:10px;width:55px;text-align:right">¥${cart[id] * item.price}</span>
+            <button class="remove-btn" onclick="removeItem(${id})">删除</button>
+          </div>
+        `
+        cartEl.appendChild(div)
+      }
+    }
+
+    // ★ 手动更新显示屏4：菜单里的按钮状态
+    MENU.forEach(item => {
+      const btn = document.getElementById('btn-' + item.id)
+      if (btn) {
+        const qty = cart[item.id] || 0
+        btn.textContent = qty > 0 ? `再来一份 (已点${qty})` : '加入购物车'
+        btn.style.background = qty > 0 ? '#4CAF50' : '#FF6B35'
+      }
+    })
+
+    // 如果漏掉任何一个 getElementById，那个地方就不更新 → Bug
+  }
+
+  function addToCart(id) {
+    cart[id] = (cart[id] || 0) + 1
+    updateAllUI() // 每次修改数据，都要调这个函数手动更新所有 UI
+  }
+
+  function changeQty(id, delta) {
+    cart[id] = Math.max(0, (cart[id] || 0) + delta)
+    updateAllUI()
+  }
+
+  function removeItem(id) {
+    cart[id] = 0
+    updateAllUI()
+  }
+
+  function checkout() {
+    const total = Object.keys(cart).reduce((sum, id) => {
+      const item = MENU.find(m => m.id === parseInt(id))
+      return sum + (cart[id] || 0) * item.price
+    }, 0)
+    if (total === 0) { alert('请先点菜！'); return }
+    alert(`结算成功！合计 ¥${total}，谢谢惠顾！`)
+    Object.keys(cart).forEach(id => cart[id] = 0)
+    updateAllUI()
+  }
+
+  // ============================================================
+  // 初始化渲染菜单
+  // ============================================================
+  const menuEl = document.getElementById('menu-list')
+  MENU.forEach(item => {
+    const div = document.createElement('div')
+    div.className = 'menu-item'
+    div.innerHTML = `
+      <span class="item-name">${item.name}</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="item-price">¥${item.price}</span>
+        <button class="add-btn" id="btn-${item.id}" onclick="addToCart(${item.id})">加入购物车</button>
+      </div>
+    `
+    menuEl.appendChild(div)
+  })
+</script>
+
+</body>
+</html>

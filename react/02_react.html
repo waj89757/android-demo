@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>餐厅点单 - React</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; background: #f5f5f5; }
+    h2 { color: #333; }
+    .section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .menu-item:last-child { border-bottom: none; }
+    .item-name { font-size: 15px; }
+    .item-price { color: #888; font-size: 14px; }
+    .add-btn { background: #FF6B35; color: white; border: none; border-radius: 20px; padding: 6px 16px; cursor: pointer; font-size: 14px; }
+    .add-btn.added { background: #4CAF50; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .cart-item:last-child { border-bottom: none; }
+    .qty-btn { background: #eee; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; }
+    .qty { margin: 0 10px; font-weight: bold; }
+    .remove-btn { color: #ff4444; background: none; border: none; cursor: pointer; font-size: 13px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .stat-box { background: white; border-radius: 10px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .stat-num { font-size: 28px; font-weight: bold; color: #FF6B35; }
+    .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+    .checkout-bar { background: #FF6B35; color: white; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .checkout-bar button { background: white; color: #FF6B35; border: none; border-radius: 8px; padding: 8px 20px; font-weight: bold; cursor: pointer; }
+    .empty-tip { color: #bbb; text-align: center; padding: 20px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2>🍜 餐厅点单系统（React）</h2>
+  <div id="root"></div>
+
+  <!-- 直接从 CDN 引入 React（无需安装，直接运行）-->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel：把 JSX 实时编译成 JS（生产环境会提前编译，这里为了演示方便）-->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    // ============================================================
+    // 菜单数据（静态，不会变）
+    // ============================================================
+    const MENU = [
+      { id: 1, name: '红烧肉', price: 48 },
+      { id: 2, name: '清蒸鱼', price: 68 },
+      { id: 3, name: '宫保鸡丁', price: 38 },
+      { id: 4, name: '炒时蔬', price: 22 },
+      { id: 5, name: '蛋花汤', price: 12 },
+    ]
+
+    // ============================================================
+    // ★★★ React 版本的核心：只有一个状态，UI 自动同步 ★★★
+    // ============================================================
+    function App() {
+
+      // ★ 唯一的数据源：购物车 { menuId → quantity }
+      // 这一份数据变了，所有依赖它的 UI 自动更新，不需要手动 getElementById
+      const [cart, setCart] = React.useState({})
+
+      // ——— 从 cart 派生出所有统计数据 ———
+      const totalCount = Object.values(cart).reduce((s, q) => s + q, 0)
+      const totalPrice = Object.entries(cart).reduce((s, [id, q]) => {
+        const item = MENU.find(m => m.id === parseInt(id))
+        return s + q * item.price
+      }, 0)
+      const kinds = Object.values(cart).filter(q => q > 0).length
+      const cartItems = MENU.filter(m => (cart[m.id] || 0) > 0)
+
+      // ——— 操作函数：只改数据，不碰 DOM ———
+      const addToCart = (id) =>
+        setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
+
+      const changeQty = (id, delta) =>
+        setCart(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }))
+
+      const removeItem = (id) =>
+        setCart(prev => ({ ...prev, [id]: 0 }))
+
+      const checkout = () => {
+        if (totalPrice === 0) { alert('请先点菜！'); return }
+        alert(`结算成功！合计 ¥${totalPrice}，谢谢惠顾！`)
+        setCart({})
+      }
+
+      // ——— 描述 UI 长什么样（只是描述，不是命令）———
+      return (
+        <div>
+          {/* ★ 统计栏：直接用变量，cart 变了这里自动更新，不用手动改 */}
+          <div className="stats">
+            <div className="stat-box">
+              <div className="stat-num">{totalCount}</div>
+              <div className="stat-label">已点菜数</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-num">¥{totalPrice}</div>
+              <div className="stat-label">合计金额</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-num">{kinds}</div>
+              <div className="stat-label">菜品种类</div>
+            </div>
+          </div>
+
+          {/* ★ 菜单：按钮状态由 cart 数据自动决定 */}
+          <div className="section">
+            <h3>📋 菜单</h3>
+            {MENU.map(item => {
+              const qty = cart[item.id] || 0
+              return (
+                <div className="menu-item" key={item.id}>
+                  <span className="item-name">{item.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span className="item-price">¥{item.price}</span>
+                    <button
+                      className={`add-btn ${qty > 0 ? 'added' : ''}`}
+                      onClick={() => addToCart(item.id)}
+                    >
+                      {qty > 0 ? `再来一份 (已点${qty})` : '加入购物车'}
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* ★ 购物车：直接从 cart 数据派生，不用手动维护 */}
+          <div className="section">
+            <h3>🛒 已点菜品</h3>
+            {cartItems.length === 0
+              ? <p className="empty-tip">还没有点菜哦</p>
+              : cartItems.map(item => (
+                <div className="cart-item" key={item.id}>
+                  <span>{item.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <button className="qty-btn" onClick={() => changeQty(item.id, -1)}>−</button>
+                    <span className="qty">{cart[item.id]}</span>
+                    <button className="qty-btn" onClick={() => changeQty(item.id, 1)}>+</button>
+                    <span style={{ marginLeft: 10, width: 55, textAlign: 'right' }}>
+                      ¥{cart[item.id] * item.price}
+                    </span>
+                    <button className="remove-btn" onClick={() => removeItem(item.id)}>删除</button>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+
+          {/* ★ 结算栏：和统计栏用同一份数据，自动一致，不可能出现"一个更新了另一个没更新"的 Bug */}
+          <div className="checkout-bar">
+            <div>共 {totalCount} 件 · 合计 ¥{totalPrice}</div>
+            <button onClick={checkout}>去结算</button>
+          </div>
+        </div>
+      )
+    }
+
+    // 把 App 组件渲染到页面的 #root 节点
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  </script>
+</body>
+</html>

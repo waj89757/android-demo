@@ -295,3 +295,163 @@ URI → Provider 的寻址过程：
 页面路由 → 数据传递 → 弹窗 → 列表 → 网络请求 → MVVM（ViewModel/LiveData）→ MVP → DeepLink
 → 系统架构：Zygote → Binder → AMS → Service → FCM/保活 → Handler/Looper → SurfaceFlinger → Canvas
 → 四大组件：Activity → Service → BroadcastReceiver → ContentProvider
+→ Web 技术栈：WebView → JSBridge → 离线包
+
+十九、WebView 与 H5 混合开发
+
+技术选型原则
+
+用 H5（WebView 内嵌网页）：内容驱动、频繁变更、不依赖设备硬件（活动运营页、帮助中心、用户协议）
+用 RN（React Native）：有一定功能复杂度、需要跨平台、交互不极致（购物车、设置页、消息列表）
+用 Native：性能是核心竞争力或必须访问系统底层（直播间、相机、首页信息流、支付、推送）
+
+WebView 原理
+
+WebView = Chromium 浏览器内核打包成的一个 Android View 控件，内部完整运行 HTML/CSS/JS。
+两个世界：Native 世界（Kotlin，有完整系统 API）和 JS 世界（沙盒，默认无设备能力）。
+沙盒：给代码一个受限运行环境，跑坏了也不影响外面，JS 不能访问相机/文件系统等。
+渲染层面：WebView 有独立 Surface（独立图层），SurfaceFlinger 把它和 Native View 合成到屏幕。
+进程风险：WebView 默认和 Native 同进程，H5 OOM 会导致整个 App Crash。
+解决：android:process=":webview" 让 WebView 跑独立进程，崩了只死 WebView 进程。
+
+JSBridge（双向通信）
+
+JS 调 Native（addJavascriptInterface 方案）：
+  webView.addJavascriptInterface(MyBridge(), "NativeBridge")
+  H5 直接调：window.NativeBridge.openCamera()
+  必须加 @JavascriptInterface 注解（Android 4.2+ 要求）
+  onReceive 在子线程执行，需 runOnUiThread 才能更新 UI
+
+Native 调 JS：
+  webView.evaluateJavascript("receiveFromNative('消息')", null)
+  H5 提前定义好对应全局函数即可接收
+
+URL 拦截方案（另一种 JS→Native 方式）：
+  JS 发假 URL：location.href = "jsbridge://openCamera"
+  shouldOverrideUrlLoading 拦截 scheme=jsbridge 的 URL，解析执行
+
+离线包（Offline Package）
+
+本质：把 H5 静态资源（HTML/CSS/JS）提前打包下载到手机本地，用户打开时 WebView 读本地文件而不走网络，白屏时间从 1-2 秒压缩到接近 0。
+
+完整流程：
+  1. H5 打包成 zip（含 manifest.json、index.html、css、js）
+  2. App 后台下载 zip，校验 md5，解压到私有目录
+  3. 加载 manifest.json 建立 URL→本地路径 映射表（HashMap）
+  4. shouldInterceptRequest 拦截每个请求：映射表命中→返回本地文件，未命中→放行走网络
+
+manifest.json 格式：
+  { "files": { "https://m.example.com/page.html": "index.html", ... } }
+
+和浏览器缓存的区别：缓存是"用了才存"，离线包是"提前下载好"，首次访问也秒开。
+
+UI 适配
+
+最关键：<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  没有这行，WebView 用 960px 桌面宽度渲染，字体极小。
+
+安全区适配（刘海/底部手势条）：
+  padding-top: env(safe-area-inset-top)
+  需配合 viewport-fit=cover 使用
+
+Native 传屏幕信息给 H5：evaluateJavascript 注入 window.nativeScreenInfo
+WebView 控制：setSupportZoom(false) 禁止缩放；textZoom=100 固定字体不跟系统走
+
+调试方式：
+  webView.setWebContentsDebuggingEnabled(true) + Chrome 打开 chrome://inspect
+  直连手机 WebView，实时调 CSS/JS，体验和浏览器开发一样
+
+WebView 常见问题（面试高频）
+
+白屏：预加载 WebView 进程池 + 离线包 + 骨架屏
+JSBridge 安全漏洞：恶意 JS 可调注入对象 → @JavascriptInterface + 域名白名单
+内存泄漏：WebView 持有 Activity Context，onDestroy 必须 stopLoading() + destroy()
+H5/Native 版本不兼容：H5 调用前检测 Bridge 是否存在，提供降级逻辑
+Debug：setWebContentsDebuggingEnabled(true)，chrome://inspect 直连
+
+二十一、React 核心知识
+
+为什么要发明 React
+
+纯 JS + HTML 的问题：数据变了，必须手动找到每个 DOM 元素逐个更新，漏一个就是 Bug。
+React 的解法：UI = f(state)。状态变了，React 自动重新计算 UI，不需要手动操作 DOM。
+
+名字含义
+
+React = Facebook 2013 年发布的前端框架，核心是声明式 UI + 组件化
+Native = 渲染目标是真正的原生控件（不是 HTML），而不是 WebView 里的网页
+React Native = 用 React 的编程方式写代码，但渲染成 Android/iOS 原生控件
+
+前端学习路径
+
+HTML/CSS/JS（语言基础）→ React（框架，行业标配）→ React Native（移动端跨平台）
+
+React 五个核心语法特点
+
+1. JSX：在 JS 文件里写类 HTML 结构，{} 里是 JS 表达式
+2. 组件：函数返回 UI，大写开头，像 HTML 标签一样使用
+3. useState：管理状态，setXxx() 触发 UI 自动重渲染，const [x, setX] = useState(0) 是固定模式
+4. useEffect：处理副作用（网络请求/订阅），[] 空数组=只执行一次，类似 onCreate
+5. 箭头函数+解构：到处可见，先认识语法再深入
+
+React 四大优点
+
+1. 数据-UI 自动同步：setCart() 一行，所有依赖 cart 的 UI 自动更新，不可能漏
+2. 组件复用：DishCard 定义一次，传不同 props 用 N 次，改一处全更新
+3. 生态丰富：路由/状态管理/图表/表单/动画，几乎任何需求有现成库
+4. 可测试性：业务逻辑是纯函数，和 UI 解耦，单测极简单
+
+JSX 与 React 的关系
+
+JSX 是语法糖，不是 React 本身。浏览器不认识 JSX，必须先编译：
+- 开发/演示：Babel 在浏览器里实时编译（type="text/babel"），慢，只用于学习
+- 真实项目：Webpack/Vite 提前编译成普通 JS，用户拿到的浏览器直接认识
+- 编译结果：<p>{count}</p> → React.createElement("p", null, count)
+
+DOM 与虚拟 DOM
+
+DOM = 浏览器把 HTML 解析后在内存里建的对象树（对应 Android 的 View 树）
+操作真实 DOM 很慢（触发重排重绘）
+React 先用虚拟 DOM（普通 JS 对象树）在内存里算好差异，再最小化更新真实 DOM
+setCount() 触发：重执行函数 → 新虚拟 DOM → Diff → 只改有变化的 DOM 节点
+
+useState 原理
+
+组件是普通函数，每次渲染都重新执行，局部变量会消失。
+状态不存在函数里，存在 React 内部的一个数组（stateStorage）里，按 useState 调用顺序对应 slot：
+- 第一次执行：slot 没有值 → 用初始值写入
+- 后续执行：直接从 slot 取值，初始值被忽略
+- setXxx(newVal)：把新值写入 slot → 触发函数重新执行 → UI 更新
+
+const [count, setCount] = useState(0) 是数组解构语法：
+  useState 返回 [当前值, setter函数]，解构把两者分别赋给变量，等价于：
+  const result = useState(0); const count = result[0]; const setCount = result[1]
+
+规则：useState 必须在函数顶层调用，不能放在 if/for 里。
+原因：React 靠调用顺序（slot 下标）识别每个状态，顺序乱了就对应错误。
+
+类比：状态仓库 ≈ ViewModel，组件重渲染 ≈ Activity 重建，从 slot 取值 ≈ 从 ViewModel 取值。
+
+Demo 文件
+
+react/01_vanilla_js.html    纯 JS 餐厅点单（updateAllUI 手动更新 N 处，直观看痛点）
+react/02_react.html          React 同一功能（setCart 一行搞定）
+react/03_four_features.html  Tab 页演示四大特性（数据同步/组件复用/生态/可测试性）
+
+二十、WebView 进阶学习路线（待学）
+
+第一优先级（直接影响团队日常）：
+- JSBridge 协议设计：统一 method/params/callbackId 格式，Bridge 版本管理，避免频繁发版
+- 性能监控体系：白屏率、FPS、JS 报错上报（window.onerror），接入监控平台
+- 离线包管理流程：发布、版本控制、灰度、回滚机制
+- 登录态/Cookie 同步：Native token 通过 CookieManager 注入 WebView，H5 接口自动携带
+
+第二优先级（和 H5 团队协作）：
+- H5 路由与 Native 返回键协作（webView.canGoBack() vs finish()）
+- 容灾降级：离线包失败→网络兜底，白屏检测→重试页
+- 安全：URL 白名单、Bridge 鉴权、HTTPS 强制
+
+第三优先级（深入了解）：
+- WebView 预加载优化体系（进程池、DNS 预解析、网络预连接）
+- RN vs Flutter vs H5 动态化方案对比
+- 小程序架构（特殊的双线程 WebView 方案）

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>React 四大特性演示</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #F0F4F8; color: #333; }
+
+    /* 顶部 Tab 导航 */
+    .tab-bar { display: flex; background: #1a1a2e; padding: 0 16px; }
+    .tab { padding: 14px 20px; color: #aaa; cursor: pointer; font-size: 14px; border-bottom: 3px solid transparent; }
+    .tab.active { color: #fff; border-bottom-color: #FF6B35; }
+
+    /* 内容区 */
+    .page { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h3 { font-size: 15px; margin-bottom: 12px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+    .tag { display: inline-block; background: #FF6B35; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+
+    /* 特性1：数据同步 */
+    .sync-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .sync-box { background: #FFF3EE; border-radius: 8px; padding: 12px; text-align: center; }
+    .sync-num { font-size: 26px; font-weight: bold; color: #FF6B35; }
+    .sync-label { font-size: 11px; color: #888; margin-top: 4px; }
+
+    /* 特性2：组件复用 */
+    .dish-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dish-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+    .dish-emoji { font-size: 36px; text-align: center; padding: 16px; background: #f9f9f9; }
+    .dish-info { padding: 10px; }
+    .dish-name { font-weight: bold; font-size: 14px; }
+    .dish-price { color: #FF6B35; font-size: 13px; margin-top: 2px; }
+    .dish-btn { width: 100%; margin-top: 8px; background: #FF6B35; color: white; border: none; border-radius: 6px; padding: 6px; cursor: pointer; font-size: 13px; }
+    .dish-btn.in-cart { background: #4CAF50; }
+
+    /* 特性3：生态 */
+    .chart-bar-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .chart-row { display: flex; align-items: center; gap: 8px; }
+    .chart-name { width: 60px; font-size: 12px; color: #555; text-align: right; }
+    .chart-bar-bg { flex: 1; background: #eee; border-radius: 4px; height: 22px; overflow: hidden; }
+    .chart-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; color: white; font-weight: bold; transition: width 0.6s ease; }
+    .chart-val { width: 40px; font-size: 12px; color: #555; }
+
+    /* 特性4：可测试性 */
+    .test-case { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9f9f9; border-radius: 6px; margin-bottom: 6px; }
+    .test-icon { font-size: 16px; }
+    .test-desc { flex: 1; font-size: 13px; color: #555; }
+    .test-result { font-size: 12px; font-weight: bold; }
+    .test-result.pass { color: #4CAF50; }
+    .run-btn { width: 100%; padding: 10px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 8px; }
+
+    /* 购物车浮层 */
+    .cart-float { position: fixed; bottom: 20px; right: 20px; background: #FF6B35; color: white; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(255,107,53,0.4); cursor: pointer; }
+    .cart-badge { position: absolute; top: -4px; right: -4px; background: #1a1a2e; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React
+
+    // ================================================================
+    // 数据
+    // ================================================================
+    const DISHES = [
+      { id: 1, name: '红烧肉', price: 48, emoji: '🥩', sales: 342 },
+      { id: 2, name: '清蒸鱼', price: 68, emoji: '🐟', sales: 287 },
+      { id: 3, name: '宫保鸡丁', price: 38, emoji: '🍗', sales: 456 },
+      { id: 4, name: '炒时蔬', price: 22, emoji: '🥦', sales: 198 },
+    ]
+
+    // ================================================================
+    // 纯函数（业务逻辑）——可独立测试，和 UI 完全无关
+    // ================================================================
+    const calcTotal = (cart) =>
+      Object.entries(cart).reduce((sum, [id, qty]) => {
+        const dish = DISHES.find(d => d.id === parseInt(id))
+        return sum + qty * dish.price
+      }, 0)
+
+    const calcCount = (cart) =>
+      Object.values(cart).reduce((s, q) => s + q, 0)
+
+    const calcKinds = (cart) =>
+      Object.values(cart).filter(q => q > 0).length
+
+    // ================================================================
+    // ★ 特性二：组件复用
+    // DishCard 是一个组件：定义一次，用四次，传不同数据
+    // ================================================================
+    function DishCard({ dish, qty, onAdd }) {
+      return (
+        <div className="dish-card">
+          <div className="dish-emoji">{dish.emoji}</div>
+          <div className="dish-info">
+            <div className="dish-name">{dish.name}</div>
+            <div className="dish-price">¥{dish.price}</div>
+            <button
+              className={`dish-btn ${qty > 0 ? 'in-cart' : ''}`}
+              onClick={() => onAdd(dish.id)}
+            >
+              {qty > 0 ? `✓ 已点 ${qty} 份` : '加入购物车'}
+            </button>
+          </div>
+        </div>
+      )
+    }
+    // 如果要修改所有菜品卡片的样式，只改这一个组件就够了
+
+    // ================================================================
+    // ★ 特性三：生态
+    // 用自制的图表组件演示"现成 UI 组件直接使用"的效果
+    // （实际项目里这里 import Recharts 一行代码就出图表）
+    // ================================================================
+    function SalesChart({ cart }) {
+      const maxSales = Math.max(...DISHES.map(d => d.sales))
+      const colors = ['#FF6B35','#4CAF50','#2196F3','#9C27B0']
+      return (
+        <div className="chart-bar-wrap">
+          {DISHES.map((dish, i) => {
+            // ★ 已点的菜品，销量显示加粗颜色不同
+            const inCart = (cart[dish.id] || 0) > 0
+            const pct = Math.round(dish.sales / maxSales * 100)
+            return (
+              <div className="chart-row" key={dish.id}>
+                <div className="chart-name">{dish.emoji}{dish.name}</div>
+                <div className="chart-bar-bg">
+                  <div
+                    className="chart-bar-fill"
+                    style={{ width: pct + '%', background: inCart ? '#FF6B35' : '#ccc' }}
+                  >
+                    {inCart ? '★ 已点' : ''}
+                  </div>
+                </div>
+                <div className="chart-val">{dish.sales}份</div>
+              </div>
+            )
+          })}
+          <p style={{fontSize:12,color:'#aaa',marginTop:4}}>
+            橙色 = 你已点的菜品（购物车变化，图表自动高亮）
+          </p>
+        </div>
+      )
+    }
+
+    // ================================================================
+    // ★ 特性四：可测试性
+    // 业务逻辑是纯函数，给输入必出固定输出，单测极简单
+    // ================================================================
+    function TestPanel() {
+      const [results, setResults] = useState([])
+      const [ran, setRan] = useState(false)
+
+      const runTests = () => {
+        // 这些就是真实的单元测试，只是在浏览器里跑
+        const tests = [
+          {
+            desc: 'calcTotal：空购物车合计 = 0',
+            run: () => calcTotal({}) === 0,
+          },
+          {
+            desc: 'calcTotal：红烧肉×2 + 清蒸鱼×1 = 164',
+            run: () => calcTotal({ 1: 2, 2: 1 }) === 164,   // 48×2 + 68×1
+          },
+          {
+            desc: 'calcCount：3件商品共 5 份',
+            run: () => calcCount({ 1: 2, 2: 1, 3: 2 }) === 5,
+          },
+          {
+            desc: 'calcKinds：有数量的种类 = 2',
+            run: () => calcKinds({ 1: 2, 2: 0, 3: 1 }) === 2,
+          },
+          {
+            desc: 'calcTotal：购物车清空后 = 0',
+            run: () => calcTotal({ 1: 0, 2: 0 }) === 0,
+          },
+        ]
+
+        setResults(tests.map(t => ({ desc: t.desc, pass: t.run() })))
+        setRan(true)
+      }
+
+      return (
+        <div>
+          <p style={{fontSize:13,color:'#888',marginBottom:10}}>
+            业务逻辑（calcTotal/calcCount/calcKinds）是纯函数，
+            和 UI 完全解耦，可以直接写单元测试：
+          </p>
+          {ran && results.map((r, i) => (
+            <div className="test-case" key={i}>
+              <span className="test-icon">{r.pass ? '✅' : '❌'}</span>
+              <span className="test-desc">{r.desc}</span>
+              <span className={`test-result ${r.pass ? 'pass' : ''}`}>
+                {r.pass ? 'PASS' : 'FAIL'}
+              </span>
+            </div>
+          ))}
+          <button className="run-btn" onClick={runTests}>
+            {ran ? '重新运行测试' : '▶ 运行单元测试'}
+          </button>
+        </div>
+      )
+    }
+
+    // ================================================================
+    // ★ 主应用
+    // ================================================================
+    const TABS = ['特性一：数据同步', '特性二：组件复用', '特性三：生态', '特性四：可测试性']
+
+    function App() {
+      const [activeTab, setActiveTab] = useState(0)
+
+      // ★ 特性一的核心：一份 cart 数据，多处 UI 自动同步
+      const [cart, setCart] = useState({})
+
+      const addToCart = (id) =>
+        setCart(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
+
+      // 从 cart 派生的统计（每次 cart 变，这些自动重算）
+      const total = calcTotal(cart)
+      const count = calcCount(cart)
+      const kinds = calcKinds(cart)
+
+      return (
+        <div>
+          {/* Tab 导航 */}
+          <div className="tab-bar">
+            {TABS.map((t, i) => (
+              <div
+                key={i}
+                className={`tab ${activeTab === i ? 'active' : ''}`}
+                onClick={() => setActiveTab(i)}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+
+          <div className="page">
+
+            {/* ========================== 特性一 ========================== */}
+            {activeTab === 0 && (
+              <div>
+                <div className="card">
+                  <h3>同一份数据（cart），驱动下面所有 UI <span className="tag">自动同步</span></h3>
+                  {/* 三个统计框 —— 直接用变量，不需要 getElementById */}
+                  <div className="sync-grid">
+                    <div className="sync-box">
+                      <div className="sync-num">{count}</div>
+                      <div className="sync-label">总件数</div>
+                    </div>
+                    <div className="sync-box">
+                      <div className="sync-num">¥{total}</div>
+                      <div className="sync-label">合计</div>
+                    </div>
+                    <div className="sync-box">
+                      <div className="sync-num">{kinds}</div>
+                      <div className="sync-label">种类数</div>
+                    </div>
+                  </div>
+                  <p style={{fontSize:13,color:'#888',marginBottom:12}}>
+                    点击下面的菜品加入购物车，三个数字同时自动更新：
+                  </p>
+                  {/* 菜品按钮 */}
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {DISHES.map(dish => (
+                      <button
+                        key={dish.id}
+                        onClick={() => addToCart(dish.id)}
+                        style={{padding:'8px 14px',background:'#FF6B35',color:'white',border:'none',borderRadius:8,cursor:'pointer',fontSize:13}}
+                      >
+                        {dish.emoji} {dish.name}（已点 {cart[dish.id] || 0} 份）
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{fontSize:12,color:'#aaa',marginTop:12}}>
+                    纯 JS 版本：每次要手动 getElementById 更新 3 个地方，漏一个就是 Bug<br/>
+                    React 版本：setCart() 一行，三处自动同步，不可能漏
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ========================== 特性二 ========================== */}
+            {activeTab === 1 && (
+              <div>
+                <div className="card">
+                  <h3>DishCard 组件 <span className="tag">定义一次，使用四次</span></h3>
+                  <p style={{fontSize:13,color:'#888',marginBottom:12}}>
+                    四张卡片用的是同一个 DishCard 组件，传入不同的 dish 数据。
+                    想改所有卡片的样式？只改组件内部，四张同时变。
+                  </p>
+                  {/* ★ 同一个组件用了四次，只是数据不同 */}
+                  <div className="dish-grid">
+                    {DISHES.map(dish => (
+                      <DishCard
+                        key={dish.id}
+                        dish={dish}
+                        qty={cart[dish.id] || 0}
+                        onAdd={addToCart}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ========================== 特性三 ========================== */}
+            {activeTab === 2 && (
+              <div>
+                <div className="card">
+                  <h3>生态：直接使用现成组件 <span className="tag">生态丰富</span></h3>
+                  <p style={{fontSize:13,color:'#888',marginBottom:12}}>
+                    实际项目里一行 import 引入图表库（Recharts/Victory），
+                    这里用自制图表演示：购物车里点了哪道菜，图表自动高亮。
+                  </p>
+                  <SalesChart cart={cart} />
+                  <div style={{marginTop:12,padding:10,background:'#f0f4f8',borderRadius:8,fontSize:12,color:'#666'}}>
+                    先去「特性二」页面加几道菜，回来看图表变化 →
+                    购物车数据（cart）和图表组件共享同一份状态，自动联动
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ========================== 特性四 ========================== */}
+            {activeTab === 3 && (
+              <div>
+                <div className="card">
+                  <h3>可测试性 <span className="tag">纯函数，天然好测</span></h3>
+                  <TestPanel />
+                </div>
+                <div className="card">
+                  <h3>为什么纯 JS 难测试？</h3>
+                  <p style={{fontSize:13,color:'#666',lineHeight:1.7}}>
+                    纯 JS 里业务逻辑和 DOM 操作混在一起：<br/>
+                    <code style={{background:'#f5f5f5',padding:'2px 6px',borderRadius:4}}>
+                      document.getElementById('total').textContent = price * qty
+                    </code><br/><br/>
+                    要测试这行，必须先创建一个假的 HTML 环境，很麻烦。<br/><br/>
+                    React 里计算逻辑是独立的纯函数：<br/>
+                    <code style={{background:'#f5f5f5',padding:'2px 6px',borderRadius:4}}>
+                      const calcTotal = (cart) =&gt; ...
+                    </code><br/><br/>
+                    直接调用、直接断言，不需要任何浏览器环境。
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 购物车浮动按钮（四个 Tab 都可见，体现跨组件状态共享）*/}
+          {count > 0 && (
+            <div className="cart-float">
+              🛒
+              <div className="cart-badge">{count}</div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  </script>
+</body>
+</html>
