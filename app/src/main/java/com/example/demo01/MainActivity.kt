@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnWebview: Button
     private lateinit var btnOfflineDemo: Button
     private lateinit var btnHotUpdate: Button
+    private lateinit var btnProfile: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -101,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         btnWebview = findViewById(R.id.btn_webview)
         btnOfflineDemo = findViewById(R.id.btn_offline_demo)
         btnHotUpdate = findViewById(R.id.btn_hot_update)
+        btnProfile   = findViewById(R.id.btn_profile)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -251,6 +253,27 @@ class MainActivity : AppCompatActivity() {
         btnHotUpdate.setOnClickListener {
             val intent = Intent(this, HotUpdateDemoActivity::class.java)
             startActivity(intent)
+        }
+
+        // ★ 个人资料页（Figma UI 练习）
+        btnProfile.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
+        // ★ RN URI 路由：三个页面入口
+        fun openRN(uri: String) {
+            val intent = Intent(this, RNContainerActivity::class.java)
+            intent.putExtra("uri", uri)
+            startActivity(intent)
+        }
+        findViewById<Button>(R.id.btn_rn_product).setOnClickListener {
+            openRN("myapp://product/detail?id=666&name=%E8%93%9D%E7%89%99%E8%80%B3%E6%9C%BA")
+        }
+        findViewById<Button>(R.id.btn_rn_user).setOnClickListener {
+            openRN("myapp://user/profile?userId=u_10086")
+        }
+        findViewById<Button>(R.id.btn_rn_order).setOnClickListener {
+            openRN("myapp://order/list")
         }
 
         btnDialog.setOnClickListener {

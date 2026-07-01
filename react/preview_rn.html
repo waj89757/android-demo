@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RN Router 预览</title>
+    <script>
+        // 模拟 Native 注入的路由配置（浏览器里手动设置）
+        // 改这里就能预览不同页面
+        window.ROUTE_CONFIG = {
+            route: "product/detail",
+            params: { id: "666", name: "蓝牙耳机" }
+        };
+
+        // 模拟 NativeBridge（浏览器里 Native 不存在，用假的代替）
+        window.NativeBridge = {
+            onPageReady:  function(r)    { console.log('[Bridge] onPageReady:', r); },
+            addToCart:    function(id,n) { alert('加入购物车: ' + n + '(id=' + id + ')'); },
+            getUserInfo:  function(uid)  { 
+                console.log('[Bridge] getUserInfo:', uid);
+                // 模拟 Native 回调
+                setTimeout(function() {
+                    onUserInfoReceived({name:'王安杰', team:'海外增长', userId: uid});
+                }, 300);
+            },
+            goBack:       function()     { history.back(); }
+        };
+    </script>
+</head>
+<body style="margin:0;padding:0;background:#F5F5F5">
+    <div id="app-root"></div>
+    <script src="/Users/waj/AndroidStudioProjects/demo01/app/src/main/assets/router_bundle.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            renderApp('app-root');
+        });
+    </script>
+</body>
+</html>

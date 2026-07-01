@@ -136,6 +136,28 @@
             android:exported="false" />
 
         <!--
+            ★★★ RN 容器 Activity：支持两种启动方式
+            1. Native 内部：startActivity + putExtra("uri", "myapp://...")
+            2. DeepLink：浏览器/Push 打开 myapp:// URI，系统自动路由到此 Activity
+        -->
+        <!-- ★ 用户个人资料页（Figma UI 练习） -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RNContainerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- ★ 注册 URI scheme：myapp:// -->
+                <data android:scheme="myapp" />
+            </intent-filter>
+        </activity>
+
+        <!--
         ★★★ ContentProvider 注册 ★★★
         authorities：全局唯一标识，相当于域名，调用方通过它找到这个 Provider
         exported：false = 仅 App 内部使用，true = 对外开放（需要配合 permission）

@@ -224,6 +224,62 @@
             android:backgroundTint="#E65100"
             android:layout_marginTop="15dp"/>
 
+        <!-- ★ RN URI 路由：三个页面入口 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="── RN URI 路由 Demo ──"
+            android:textSize="12sp"
+            android:textColor="#888"
+            android:gravity="center"
+            android:layout_marginTop="16dp"/>
+
+        <Button
+            android:id="@+id/btn_rn_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="myapp://product/detail?id=666&amp;name=蓝牙耳机"
+            android:backgroundTint="#FF6F00"
+            android:textSize="11sp"
+            android:layout_marginTop="6dp"/>
+
+        <Button
+            android:id="@+id/btn_rn_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="myapp://user/profile?userId=u_10086"
+            android:backgroundTint="#1565C0"
+            android:textSize="11sp"
+            android:layout_marginTop="6dp"/>
+
+        <Button
+            android:id="@+id/btn_rn_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="myapp://order/list"
+            android:backgroundTint="#2E7D32"
+            android:textSize="11sp"
+            android:layout_marginTop="6dp"/>
+
+        <!-- ══ UI 布局练习 ══ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="── UI 布局练习 ──"
+            android:textSize="12sp"
+            android:textColor="#888888"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp" />
+
+        <Button
+            android:id="@+id/btn_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="个人资料页 (Figma 练习)"
+            android:backgroundTint="#5C6BC0"
+            android:layout_marginTop="6dp" />
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Profile Page：包含 General Tab 和 Location Tab
+    General 数据源：figma-40-381
+    Location 数据源：figma-46-138
+    切换方式：点击 Tab，通过 VISIBLE/GONE 切换两组表单
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="vertical">
+
+        <!-- ========== Status Bar (44dp) ========== -->
+        <LinearLayout
+            android:id="@+id/figmaStatusBar"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="14dp">
+
+            <ImageView
+                android:id="@+id/ivStatusTime"
+                android:layout_width="54dp"
+                android:layout_height="21dp"
+                android:contentDescription="@null"
+                android:src="@drawable/figma_profile_status_time" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="14dp"
+                android:contentDescription="@null"
+                android:src="@drawable/figma_profile_status_network" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:contentDescription="@null"
+                android:src="@drawable/figma_profile_status_wifi" />
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:contentDescription="@null"
+                android:src="@drawable/figma_profile_status_battery" />
+        </LinearLayout>
+
+        <!-- ========== Top Bar (33dp) ========== -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="33dp"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="返回"
+                android:padding="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/figma_profile_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/btnTopEdit"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="编辑"
+                android:padding="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/figma_profile_edit_top"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ========== Avatar (141×144dp) ========== -->
+        <FrameLayout
+            android:id="@+id/avatarGroup"
+            android:layout_width="141dp"
+            android:layout_height="144dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="7dp">
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="141dp"
+                android:layout_height="130dp"
+                android:layout_gravity="top|start"
+                android:contentDescription="头像"
+                android:scaleType="fitCenter"
+                android:src="@drawable/figma_profile_avatar" />
+
+            <FrameLayout
+                android:id="@+id/avatarEditGroup"
+                android:layout_width="42dp"
+                android:layout_height="41dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="9dp"
+                android:background="@drawable/figma_profile_avatar_edit_bg">
+
+                <ImageView
+                    android:layout_width="27dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="换头像"
+                    android:src="@drawable/figma_profile_avatar_edit_icon" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- ========== Tabs (306×30dp) ========== -->
+        <FrameLayout
+            android:id="@+id/tabGroup"
+            android:layout_width="306dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/tabGeneral"
+                android:layout_width="172dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_figma_tab_general_unselected"
+                android:gravity="center"
+                android:text="General"
+                android:textColor="#ADADAD"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabLocation"
+                android:layout_width="150dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:background="@drawable/bg_figma_tab_location_selected"
+                android:gravity="center"
+                android:text="Location"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- ========== General Tab 内容（默认隐藏，点击 General 显示）========== -->
+        <LinearLayout
+            android:id="@+id/formGeneral"
+            android:layout_width="342dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Department (全宽, 灰色背景, 只读) -->
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:text="Department" />
+
+            <TextView
+                android:id="@+id/tvDepartment"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_gray"
+                android:text="CSX"
+                android:textColor="#9F9999" />
+
+            <!-- Degree + Specialization (两列各 150dp) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Degree" />
+
+                    <TextView
+                        android:id="@+id/tvDegree"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_gray"
+                        android:text="B.Tech"
+                        android:textColor="#9F9999" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Specialization" />
+
+                    <TextView
+                        android:id="@+id/tvSpecialization"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_gray"
+                        android:text="XXX"
+                        android:textColor="#9F9999" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Gender + Category (两列各 150dp) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="19dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Gender" />
+
+                    <TextView
+                        android:id="@+id/tvGender"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_white"
+                        android:text="XXXX"
+                        android:textColor="#544C4C" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="42dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Category" />
+
+                    <TextView
+                        android:id="@+id/tvCategory"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_white"
+                        android:text="XXX"
+                        android:textColor="#544C4C" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Mobile (全宽, 带右侧图标) -->
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="17dp"
+                android:text="Mobile" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mobileInputRow"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:paddingStart="15dp"
+                android:paddingEnd="9dp">
+
+                <TextView
+                    android:id="@+id/tvMobile"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="98490XXXXX"
+                    android:textColor="#544C4C"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/ivMobileIcon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivMobileIcon"
+                    android:layout_width="25dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/figma_93_222"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Academic Year + Admission Type (两列) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="21dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="149dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Academic Year" />
+
+                    <TextView
+                        android:id="@+id/tvAcademicYear"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_gray"
+                        android:text="20XX - XX"
+                        android:textColor="#9F9999" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/FigmaProfileLabel"
+                        android:text="Admission Type" />
+
+                    <TextView
+                        android:id="@+id/tvAdmissionType"
+                        style="@style/FigmaProfileInputText"
+                        android:layout_marginTop="11dp"
+                        android:background="@drawable/bg_figma_profile_input_gray"
+                        android:text="XXXX"
+                        android:textColor="#9F9999" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Parent Email (全宽) -->
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="17dp"
+                android:text="Parent Email" />
+
+            <TextView
+                android:id="@+id/tvParentEmail"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:text="XXXXXXX@gmail.com"
+                android:textColor="#544C4C" />
+
+            <!-- Father Name (全宽) -->
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="17dp"
+                android:text="Father Name" />
+
+            <TextView
+                android:id="@+id/tvFatherName"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:text="XXXXXXXXXXXXX"
+                android:textColor="#544C4C" />
+
+            <!-- Mother Name (全宽) -->
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="21dp"
+                android:text="Mother Name" />
+
+            <TextView
+                android:id="@+id/tvMotherName"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:text="XXXXXXXXXXXXXX"
+                android:textColor="#544C4C" />
+
+        </LinearLayout>
+
+        <!-- ========== Location Tab 内容（默认显示，点击 Location 显示）========== -->
+        <LinearLayout
+            android:id="@+id/locationForm"
+            android:layout_width="342dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:text="Street" />
+
+            <EditText
+                android:id="@+id/etStreet"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:hint="XXXXXXXXXXXXXXXXX"
+                android:inputType="textPostalAddress" />
+
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="18dp"
+                android:text="City" />
+
+            <EditText
+                android:id="@+id/etCity"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:hint="XXXXXXXXXXXXXXXXX"
+                android:inputType="textPostalAddress" />
+
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="18dp"
+                android:text="State" />
+
+            <EditText
+                android:id="@+id/etState"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_white"
+                android:hint="XXXXXX"
+                android:inputType="textPostalAddress" />
+
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="24dp"
+                android:text="Country" />
+
+            <TextView
+                android:id="@+id/tvCountry"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_gray"
+                android:text="XXXXXX"
+                android:textColor="#9F9999" />
+
+            <TextView
+                style="@style/FigmaProfileLabel"
+                android:layout_marginTop="12dp"
+                android:text="Pin Code" />
+
+            <TextView
+                android:id="@+id/tvPinCode"
+                style="@style/FigmaProfileInputText"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/bg_figma_profile_input_gray"
+                android:text="XXX XXX"
+                android:textColor="#9F9999" />
+        </LinearLayout>
+
+        <!-- ========== Save Changes 按钮 (221×45dp) ========== -->
+        <TextView
+            android:id="@+id/btnSaveChanges"
+            android:layout_width="221dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="86dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_figma_save_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="Save changes"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
