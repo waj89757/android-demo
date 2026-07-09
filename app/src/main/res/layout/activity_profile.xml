@@ -262,12 +262,13 @@
                         style="@style/FigmaProfileLabel"
                         android:text="Gender" />
 
-                    <TextView
-                        android:id="@+id/tvGender"
+                    <EditText
+                        android:id="@+id/etGender"
                         style="@style/FigmaProfileInputText"
                         android:layout_marginTop="11dp"
                         android:background="@drawable/bg_figma_profile_input_white"
-                        android:text="XXXX"
+                        android:hint="XXXX"
+                        android:inputType="textPersonName"
                         android:textColor="#544C4C" />
                 </LinearLayout>
 
@@ -282,12 +283,13 @@
                         style="@style/FigmaProfileLabel"
                         android:text="Category" />
 
-                    <TextView
-                        android:id="@+id/tvCategory"
+                    <EditText
+                        android:id="@+id/etCategory"
                         style="@style/FigmaProfileInputText"
                         android:layout_marginTop="11dp"
                         android:background="@drawable/bg_figma_profile_input_white"
-                        android:text="XXX"
+                        android:hint="XXX"
+                        android:inputType="text"
                         android:textColor="#544C4C" />
                 </LinearLayout>
             </LinearLayout>
@@ -307,11 +309,13 @@
                 android:paddingStart="15dp"
                 android:paddingEnd="9dp">
 
-                <TextView
-                    android:id="@+id/tvMobile"
+                <EditText
+                    android:id="@+id/etMobile"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="98490XXXXX"
+                    android:background="@null"
+                    android:hint="98490XXXXX"
+                    android:inputType="phone"
                     android:textColor="#544C4C"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -382,12 +386,13 @@
                 android:layout_marginTop="17dp"
                 android:text="Parent Email" />
 
-            <TextView
-                android:id="@+id/tvParentEmail"
+            <EditText
+                android:id="@+id/etParentEmail"
                 style="@style/FigmaProfileInputText"
                 android:layout_marginTop="11dp"
                 android:background="@drawable/bg_figma_profile_input_white"
-                android:text="XXXXXXX@gmail.com"
+                android:hint="XXXXXXX@gmail.com"
+                android:inputType="textEmailAddress"
                 android:textColor="#544C4C" />
 
             <!-- Father Name (全宽) -->
@@ -396,12 +401,13 @@
                 android:layout_marginTop="17dp"
                 android:text="Father Name" />
 
-            <TextView
-                android:id="@+id/tvFatherName"
+            <EditText
+                android:id="@+id/etFatherName"
                 style="@style/FigmaProfileInputText"
                 android:layout_marginTop="11dp"
                 android:background="@drawable/bg_figma_profile_input_white"
-                android:text="XXXXXXXXXXXXX"
+                android:hint="XXXXXXXXXXXXX"
+                android:inputType="textPersonName"
                 android:textColor="#544C4C" />
 
             <!-- Mother Name (全宽) -->
@@ -410,12 +416,13 @@
                 android:layout_marginTop="21dp"
                 android:text="Mother Name" />
 
-            <TextView
-                android:id="@+id/tvMotherName"
+            <EditText
+                android:id="@+id/etMotherName"
                 style="@style/FigmaProfileInputText"
                 android:layout_marginTop="11dp"
                 android:background="@drawable/bg_figma_profile_input_white"
-                android:text="XXXXXXXXXXXXXX"
+                android:hint="XXXXXXXXXXXXXX"
+                android:inputType="textPersonName"
                 android:textColor="#544C4C" />
 
         </LinearLayout>
