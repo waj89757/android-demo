@@ -280,6 +280,14 @@
             android:backgroundTint="#5C6BC0"
             android:layout_marginTop="6dp" />
 
+        <Button
+            android:id="@+id/btn_wanas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wanas 首页 (Fragment + RecyclerView 练习)"
+            android:backgroundTint="#6A3DB8"
+            android:layout_marginTop="6dp" />
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

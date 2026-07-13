@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnOfflineDemo: Button
     private lateinit var btnHotUpdate: Button
     private lateinit var btnProfile: Button
+    private lateinit var btnWanas: Button
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
@@ -103,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         btnOfflineDemo = findViewById(R.id.btn_offline_demo)
         btnHotUpdate = findViewById(R.id.btn_hot_update)
         btnProfile   = findViewById(R.id.btn_profile)
+        btnWanas     = findViewById(R.id.btn_wanas)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
@@ -258,6 +260,11 @@ class MainActivity : AppCompatActivity() {
         // ★ 个人资料页（Figma UI 练习）
         btnProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
+        // ★ Wanas 首页（Fragment + BottomNav + RecyclerView 多类型）
+        btnWanas.setOnClickListener {
+            startActivity(Intent(this, WanasActivity::class.java))
         }
 
         // ★ RN URI 路由：三个页面入口

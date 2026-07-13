@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  列表 item：横幅广告卡（Banner）
+  混排在用户卡片之间，宽度铺满
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="#3D2080"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_banner_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_banner_sub"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#CCAAFF"
+        android:textSize="13sp"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_banner_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

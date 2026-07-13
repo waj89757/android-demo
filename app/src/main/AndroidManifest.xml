@@ -145,6 +145,11 @@
             android:name=".ProfileActivity"
             android:exported="false" />
 
+        <!-- ★ Wanas 首页（Fragment + BottomNav + RecyclerView 多类型练习） -->
+        <activity
+            android:name=".WanasActivity"
+            android:exported="false" />
+
         <activity
             android:name=".RNContainerActivity"
             android:exported="true">
