@@ -832,3 +832,140 @@ Choreographer 用同步屏障让渲染插队；最终所有指令都汇聚到 Ap
     一句话总纲：Activity 是容器壳子，Fragment 是可替换的内容，RecyclerView 是带回收复用的列表引擎，
     Adapter 是数据与视图的翻译官，ViewHolder 是每个 item 的视图缓存；样式在 xml、数据在 Kotlin，
     生命周期由框架调度，滑动与渲染由框架内置——你只负责"配置策略"和"提供数据"。
+
+
+---
+
+二十五、MVVM + LiveData + 分页加载全景（Wanas Feed 实战补充）
+
+本章是对二十四章的补充，聚焦"数据从网络到屏幕"的完整链路，以及 MVVM 架构的设计动机。
+
+25.1 MVVM 三层对应关系
+
+    Model（数据层）：
+      WanasHomeItem.kt     → 纯 Kotlin 数据结构，无 Android 依赖
+      WanasRepository.kt   → 数据来源（mock delay / 真实网络），不知道 UI 存在
+
+    ViewModel（视图模型层）：
+      WanasHomeViewModel.kt → 持有 LiveData，管分页状态（currentPage/isLoading/hasMoreData）
+                              屏幕旋转不销毁，数据不丢失
+
+    View（视图层）：
+      WanasHomeFragment.kt  → observe LiveData，操作 RecyclerView
+      WanasHomeAdapter.kt   → 把数据翻译成 RecyclerView 能用的 ViewHolder（View 辅助）
+      *.xml 布局文件         → 界面样式定义
+
+    不属于 MVVM 的组件（Android 框架）：
+      RecyclerView / LayoutManager / LiveData 本身
+
+25.2 为什么要拆这么多层
+
+    MVC（一个 Fragment 塞所有）的三个痛点：
+      1. 旋转屏幕 → Fragment 重建 → 数据丢失 → 重新请求
+         解法：ViewModel 生命周期比 Fragment 长，旋转不销毁
+      2. 代码膨胀：网络/分页/状态/UI 全在一个类里，改一处容易炸另一处
+         解法：Repository 管数据来源，ViewModel 管状态，Fragment 只管展示
+      3. 数据层直接持有 View 引用 → 内存泄漏
+         解法：ViewModel 只改 LiveData，不认识 Fragment，方向反转
+
+25.3 LiveData 的工作原理
+
+    本质：观察者模式 + 生命周期感知
+    _items.value = newData 触发 dispatchingValue()：
+      → 遍历 mObservers（注册的观察者列表）
+      → considerNotify()：Fragment 活跃（STARTED/RESUMED）且版本未处理 → 调 onChanged()
+      → Fragment 的 observe lambda 被同步执行（主线程）
+
+    observe(viewLifecycleOwner) 的意义：
+      把 Fragment 的 Lifecycle 绑定进来
+      Fragment 进后台（STOPPED）→ 暂停通知
+      Fragment.onDestroyView() → 自动移除观察者，不需要手动 removeObserver，不泄漏
+
+    MutableLiveData vs LiveData：
+      MutableLiveData：ViewModel 内部用，可以 .value = ... 修改
+      LiveData：对外暴露，Fragment 只能 observe，不能修改
+      单向控制：只有 ViewModel 能改数据，UI 只能读
+
+25.4 分页加载的代码流程
+
+    触发点：Fragment 的滚动监听
+      rv.addOnScrollListener → onScrolled(dy) → checkAndLoadMore()
+      findLastVisibleItemPosition() >= itemCount - 3 → viewModel.loadNextPage()
+      提前3条触发，让请求在用户感知之前完成
+
+    防重复请求：
+      if (isLoading == true || !hasMoreData) return
+      isLoading 守门：用户快速滑动只触发一个请求
+      hasMoreData 守门：后端返回空列表时不再请求
+
+    协程挂起不阻塞主线程：
+      viewModelScope.launch { repository.fetchPage(n) }
+      碰到 suspend delay(800) → 协程挂起，主线程立刻还给 MessageQueue
+      800ms 后协程续体被投入主线程 → 继续执行，更新 LiveData
+
+    数据追加而非替换：
+      _items.value = 旧数据 + 新数据（累积列表）
+      Fragment.observe 用 lastObservedSize 记录上次位置，subList 取增量
+      adapter.appendPage() 局部插入，不全刷
+
+25.5 LoadingItem 从代码到屏幕的完整链路
+
+    代码层（你写的）：
+      displayItems.add(WanasHomeItem.LoadingItem)
+      notifyItemInserted(pos)
+
+    框架层（RecyclerView 源码）：
+      Adapter.mObservers 通知 RecyclerViewDataObserver
+      → RecyclerView.requestLayout()
+      → ViewRootImpl.scheduleTraversals()
+      → Choreographer.postCallback()（预约 VSYNC）
+
+    渲染层（系统）：
+      VSYNC 到来 → performTraversals()
+      → performLayout()：LayoutManager.fill() → layoutChunk()
+        → recycler.getViewForPosition() → Adapter.onCreateViewHolder()
+          → inflate(item_wanas_loading.xml) → new ProgressBar
+        → Adapter.onBindViewHolder()（空）
+        → layoutDecoratedWithMargins(view, 坐标)
+      → ProgressBar.onAttachedToWindow() → ObjectAnimator.start()（开始转圈）
+      → performDraw() → GPU → SurfaceFlinger → 屏幕
+
+    转圈动画的驱动者：ObjectAnimator（不是业务代码）
+      每帧向 Choreographer 注册帧回调，自动 +旋转角度 → invalidate → 重绘
+      转圈消失：notifyItemRemoved → onDetachedFromWindow → ObjectAnimator.cancel()
+
+25.6 LayoutManager 的上下游
+
+    上游（提供 View）：
+      LayoutManager 通过 Recycler.getViewForPosition() 找 Adapter 要 ViewHolder
+      Adapter.onCreateViewHolder → inflate xml → 返回 ViewHolder（只是内存对象）
+
+    LayoutManager 本身的工作（唯一职责）：
+      layoutDecoratedWithMargins(view, left, top, right, bottom) → 定坐标
+      addView(view) → 加入 RecyclerView 子 View 列表
+
+    下游（渲染像素）：
+      LayoutManager 摆完就退出，View.draw() → GPU → 屏幕 是系统渲染管线的事
+      LayoutManager 不负责画像素
+
+25.7 ViewHolder 和 itemView 的关系（澄清常见误解）
+
+    itemView 不是每次都新建：
+      屏幕只有7个item → 只创建7个 ViewHolder + itemView
+      滑出屏幕 → ViewHolder 进 RecycledViewPool（对象还活着，不是 GC）
+      新item进入 → 从池子取出同类型 ViewHolder → onBindViewHolder 覆盖数据 → 复用
+
+    ViewHolder 是什么：
+      包着 itemView 的盒子，构造时把子 View 全 find 出来缓存
+      之后 onBindViewHolder 直接用字段赋值，不再 find（省去 View 树搜索）
+
+    为什么回收复用：
+      1000条数据，不用 RecyclerView = 1000个 View 对象 → OOM
+      RecyclerView = 始终只有屏幕可见数量（约7~9个）→ 内存恒定
+
+25.8 一句话总纲
+
+    手指滑动 → RecyclerView.onTouchEvent → LayoutManager 移位+回收复用 → VSYNC 渲染到屏幕（同步，60fps）
+    滑到底部 → onScrolled → loadNextPage → 协程挂起（主线程空闲）→ 800ms后数据回来
+    → LiveData 通知 Fragment → appendPage → notifyItemRangeInserted → requestLayout → VSYNC → 新卡片出现
+    两条线并行：渲染线（60fps）和网络线（异步协程），互不阻塞，这是 Android 流畅滑动的根本原因。
