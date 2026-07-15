@@ -969,3 +969,179 @@ Choreographer 用同步屏障让渲染插队；最终所有指令都汇聚到 Ap
     滑到底部 → onScrolled → loadNextPage → 协程挂起（主线程空闲）→ 800ms后数据回来
     → LiveData 通知 Fragment → appendPage → notifyItemRangeInserted → requestLayout → VSYNC → 新卡片出现
     两条线并行：渲染线（60fps）和网络线（异步协程），互不阻塞，这是 Android 流畅滑动的根本原因。
+
+
+---
+
+二十六、RecyclerView 深度拆解 + Fragment 生命周期（打破砂锅问答整理）
+
+本章是围绕"为什么要写这么多类"的一系列追问整理，从架构动机一路追到布局测量原理。
+
+26.1 为什么要拆这么多类（MVVM 的动机）
+
+    数据少（3~10条）时，直接 addView 注入 View 就是最优解，不需要 Adapter/ViewModel
+    拆分只在"真实项目"（数据多、需求频繁变、多人协作）才有价值
+
+    MVC 一个 Fragment 塞所有的三个痛点：
+      1. 屏幕旋转 → Fragment 销毁重建 → 数据丢失 → 重新请求
+      2. 代码膨胀 → 网络/分页/状态/UI 全在一起 → 改一处炸另一处
+      3. 数据层直接持有 View → 内存泄漏
+
+26.2 ViewModel 与生命周期
+
+    ViewModel 存在 ViewModelStore 里，由系统单独保管，横跨 Fragment 多次重建
+    ViewModel 的生死 = 它所在 Store 持有者的生死
+
+    by viewModels()          → 绑 Fragment，Fragment 销毁它就销毁
+    by activityViewModels()  → 绑宿主 Activity，tab 切换/Fragment 重建数据不丢
+                               还能让多个 Fragment 共享同一个 ViewModel
+
+    依赖方向的讲究：
+      Fragment → ViewModel  安全（拿一个更长寿的对象）
+      ViewModel → Fragment  禁止（Fragment 销毁后 ViewModel 还持有 → 泄漏+崩溃）
+
+26.3 LiveData 为什么要用订阅者
+
+    反转依赖方向：ViewModel 不持有 Fragment，只把数据放进 LiveData，Fragment 主动 observe
+    数据流：ViewModel → LiveData →（Fragment 自己来取）
+    引用流：Fragment → ViewModel（单向安全）
+
+    不用订阅者、直接在协程里调 adapter 的三个坑：
+      1. ViewModel 被迫持有 adapter/View 引用 → 泄漏
+      2. 800ms 网络返回时 Fragment 可能已销毁 → 操作已销毁 View → 崩溃
+      3. 旋转后新 Fragment 无法自动拿到数据（observe 有粘性，自动推最新值）
+
+    MutableLiveData（ViewModel 内部可写 .value=）vs LiveData（对外只读，只能 observe）
+
+26.4 Adapter 为什么需要（数据少其实不需要）
+
+    Adapter 存在的唯一理由：数据量远大于屏幕能显示的数量
+      1万条数据全建 View → OOM/ANR
+      只建可见的约10个 + 滑动复用 → 内存恒定
+      这套"建+复用+填"逻辑标准化后就是 Adapter + ViewHolder
+
+    自己给1万条列表做优化（造回收池、复用旧View、填新数据），
+    最后写出来的就是 Adapter：
+      viewPool         = RecycledViewPool
+      新建 or 复用      = onCreateViewHolder / ViewHolder 复用
+      tv.text = data   = onBindViewHolder
+
+    Adapter 和 RecyclerView 的关系（控制反转/回调模式）：
+      Adapter 是独立的类（可单独 new、可随时更换）
+      rv.adapter = adapter（注册）→ RecyclerView 决定何时回调你的方法
+      主要方向：RecyclerView → Adapter（onCreateViewHolder/onBindViewHolder/getItemCount）
+      不是绑死的共生，是"可插拔的协作"
+
+26.5 ViewHolder 为什么叫这名、为什么代码多
+
+    作用：把 item 里的子控件引用 findViewById 出来"握住"存好
+          之后每次复用直接用存好的引用填数据，不再重复 find
+          findViewById 是遍历 View 树的慢操作，滑动时每秒可能调几百次
+
+    Holder = 持有（握住）子控件引用的意思
+    单 TextView 的 item 感觉不到价值（没有子控件要 find）
+    复杂 item（头像+昵称+内容+时间+已读）省下大量 find
+
+    父类 RecyclerView.ViewHolder 几百行代码的原因：
+      它是 RecyclerView 管理这个 View 的"户口本"
+      mPosition（现在第几位）/ mItemViewType（类型）/ mFlags（状态标志）
+      / mOldPosition（动画起点）/ mPayloads（局部刷新）...
+      你的子类只加几行子控件引用，剩下都是框架调度 View 用的
+
+26.6 RecyclerView 五大组件
+
+    RecyclerView 本体 = 包工头（接触摸、管滚动状态、协调组件、触发 layout/draw）
+      Adapter          造 View + 填数据 + 报告条数
+      LayoutManager    排列位置 + 处理滚动 + 决定回收谁（最复杂）
+      Recycler         四级缓存复用池：
+                         mAttachedScrap（屏幕内临时分离）
+                         mCachedViews（刚滑走，默认2个，保留数据）
+                         RecycledViewPool（彻底滑走，按 type 分槽，清数据）
+                         mViewCacheExtension（自定义，少用）
+      ItemAnimator     增删移动画（predictive animation：对比前后位置生成过渡）
+      ItemDecoration   分割线 + 间距（getItemOffsets/onDraw/onDrawOver）
+
+    取 View 顺序：scrap → cache → pool → 都没有才 onCreateViewHolder 新建
+
+26.7 LayoutManager 只管怎么摆，不带 item 样式
+
+    LinearLayoutManager(context)                  默认竖直单列
+    LinearLayoutManager(context, HORIZONTAL, false) 水平横滑
+    GridLayoutManager(context, 2)                  2列网格
+    StaggeredGridLayoutManager(2, VERTICAL)        瀑布流
+
+    GridLayoutManager 是 LinearLayoutManager 的子类
+    → 换布局时 findLastVisibleItemPosition 等方法照样能用，其他代码不用改
+    → item 样式一行不改，只换 LayoutManager，排列形状就变
+
+    LayoutManager 运行时三件事：
+      算每个 item 坐标 / 滚动时整体偏移 / 决定回收谁、加载谁
+
+26.8 布局测量：宽度为什么随 Manager 变
+
+    android:layout_width="match_parent" 不是固定宽度，是"跟随父容器"的请求
+    真正宽度由 LayoutManager 在测量（measure）时决定
+
+    带 layout_ 前缀的属性 = 对父容器提要求（LayoutParams），父容器拍板
+      layout_width / layout_height / layout_margin
+    不带前缀的（textSize/background）= View 自己说了算
+
+    同一句 match_parent，parent 变了结果就变：
+      单列：parent = 整屏 → 卡片满行
+      2列： parent = 半屏格子 → 卡片半宽
+    写死 300dp 就不再跟随 LayoutManager
+
+26.9 inflate：XML 到 View 对象
+
+    inflate = 把 XML 布局文件"翻译"成内存里的 View 对象树
+      XML 是死的文本设计图，手机不能直接显示
+      inflate 内部：解析 XML → 反射 new 出各控件对象 → 设属性 → 按嵌套 addView
+
+    两处用到：
+      Fragment.onCreateView       → inflate 整个页面布局
+      Adapter.onCreateViewHolder  → inflate 单个 item 布局
+
+    inflate(layoutId, parent, false) 三参数：
+      layoutId 翻译哪个 xml / parent 未来的父容器(算宽高规则用) / false 先不真的塞进去
+
+26.10 Fragment 生命周期方法怎么触发
+
+    这些方法不是你调的，是 Activity 里的 FragmentManager 调的（控制反转）
+    起点：一次 Fragment 事务
+      supportFragmentManager.beginTransaction().add(container, fragment).commit()
+      commit 后排队，主线程空闲时 FragmentManager 推进 Fragment 状态机
+
+    状态机上升（每升一级调一个方法）：
+      onAttach → onCreate → onCreateView → onViewCreated
+      → onViewStateRestored → onStart → onResume
+
+    状态机下降（反向）：
+      onPause → onStop → onDestroyView → onDestroy → onDetach
+
+    onCreateView vs onViewCreated 为什么拆开：
+      onCreateView 职责单纯——inflate 并 return 一个 View（此时 View 树未挂好，别 find）
+      FragmentManager 拿到返回的 View 存进 mView
+      紧接着调 onViewCreated，把那个 View 作为参数传进来
+      → onViewCreated 时 View 一定就绪，findViewById/设 adapter/observe 放这最安全
+
+    onDestroyView 里置空引用（recyclerView.adapter = null）防内存泄漏
+
+26.11 Kotlin 语法点
+
+    by activityViewModels()  委托 + 延迟初始化（第一次用到才创建）
+    .also { it -> }          拿到对象做配置/副作用，返回对象本身（用 it 引用）
+    .apply { }               同样返回自身，但用 this 引用（可省略）
+
+26.12 一条主线串起本章
+
+    数据(Repository) → ViewModel 持有(活得久,不怕旋转)
+    → LiveData 单向推给 Fragment(安全不泄漏)
+    → Fragment 交给 Adapter(注册)
+    → Adapter 把数据翻译成 ViewHolder(复用省内存)
+    → LayoutManager 决定 ViewHolder 摆哪(match_parent 跟随父容器算宽度)
+    → inflate 把 xml 变成真实 View
+    → GPU 渲染到屏幕
+
+    贯穿全章的一个思想——控制反转：
+      Adapter 的 onBindViewHolder、Fragment 的 onCreateView，
+      都不是你主动调，而是你"填空"、框架"决定何时调"。
