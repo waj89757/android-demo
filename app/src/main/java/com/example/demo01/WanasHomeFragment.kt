@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -33,6 +34,9 @@ class WanasHomeFragment : Fragment() {
         val adapterInstance = WanasHomeAdapter()
         adapter = adapterInstance
 
+        // ★ 换成 2 列网格布局（原来是 LinearLayoutManager 单列竖直排列）
+        //   GridLayoutManager 是 LinearLayoutManager 的子类，findLastVisibleItemPosition 照样能用
+        //val layoutManager = GridLayoutManager(requireContext(), 2)
         val layoutManager = LinearLayoutManager(requireContext())
         recyclerView = view.findViewById<RecyclerView>(R.id.rv_wanas_home).also { rv ->
             rv.layoutManager = layoutManager

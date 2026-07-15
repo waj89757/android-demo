@@ -134,7 +134,7 @@ class WanasHomeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             else -> throw IllegalArgumentException("Unknown viewType: $viewType")
         }
     }
-Ï
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = displayItems[position]) {
 
