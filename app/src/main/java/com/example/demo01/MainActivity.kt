@@ -267,6 +267,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, WanasActivity::class.java))
         }
 
+        // ★ DiffUtil 演示（ListAdapter 增删改动画）
+        findViewById<Button>(R.id.btn_diffutil).setOnClickListener {
+            startActivity(Intent(this, DiffUtilDemoActivity::class.java))
+        }
+
         // ★ RN URI 路由：三个页面入口
         fun openRN(uri: String) {
             val intent = Intent(this, RNContainerActivity::class.java)

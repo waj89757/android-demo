@@ -288,6 +288,14 @@
             android:backgroundTint="#6A3DB8"
             android:layout_marginTop="6dp" />
 
+        <Button
+            android:id="@+id/btn_diffutil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DiffUtil 演示 (ListAdapter 增删改动画)"
+            android:backgroundTint="#00897B"
+            android:layout_marginTop="6dp" />
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

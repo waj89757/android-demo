@@ -150,6 +150,11 @@
             android:name=".WanasActivity"
             android:exported="false" />
 
+        <!-- ★ DiffUtil / ListAdapter 演示（商品列表增删改动画） -->
+        <activity
+            android:name=".DiffUtilDemoActivity"
+            android:exported="false" />
+
         <activity
             android:name=".RNContainerActivity"
             android:exported="true">
