@@ -272,6 +272,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, DiffUtilDemoActivity::class.java))
         }
 
+        // ★★★ KRN 演示（真实 React Native + Bridge）
+        findViewById<Button>(R.id.btn_krn).setOnClickListener {
+            startActivity(Intent(this, KRNActivity::class.java))
+        }
+
         // ★ RN URI 路由：三个页面入口
         fun openRN(uri: String) {
             val intent = Intent(this, RNContainerActivity::class.java)

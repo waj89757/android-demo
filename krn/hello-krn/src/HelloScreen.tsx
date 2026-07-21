@@ -1,0 +1,305 @@
+/**
+ * ★★★ HelloScreen：第一个 KRN 风格页面 ★★★
+ *
+ * 功能：
+ *   1. 展示用户名 + Follow 状态（模拟 BriefProfile 核心结构）
+ *   2. 点击 Follow/Unfollow 按钮 → 切换状态（演示 useState）
+ *   3. 点击 "Call Native Toast" → 通过 invoke 调用 Android Toast（演示 Bridge）
+ *   4. 点击 "Get Device Info" → invoke 获取 Native 返回的设备信息（演示 Promise）
+ *
+ * 对照 BriefProfile 的结构：
+ *   useState  → 对应 BriefProfile 里的 nickname/hasFollowed 等 state
+ *   useEffect → 对应 fetchBriefProfileData
+ *   invoke    → 对应 yoda.invoke('live.xxx', params)
+ *   View/Text/TouchableOpacity → 和 KRN 完全相同（都是标准 RN 组件）
+ */
+
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import yoda from './yoda';
+
+// ─── 类型定义 ──────────────────────────────────────────────────────────────
+
+interface DeviceInfo {
+  model: string;
+  os: string;
+  appVersion: string;
+}
+
+// ─── 组件 ──────────────────────────────────────────────────────────────────
+
+const HelloScreen: React.FC = () => {
+  // ★ State：对照 BriefProfile 的 nickname/hasFollowed 等
+  const [nickname] = useState<string>('王安杰 (KRN Demo)');
+  const [hasFollowed, setHasFollowed] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [log, setLog] = useState<string[]>([]);
+
+  // 日志工具：显示在页面上，方便 Android 调试
+  const appendLog = useCallback((msg: string) => {
+    setLog(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 9)]);
+  }, []);
+
+  // ★ useEffect：对照 BriefProfile 的 fetchBriefProfileData
+  //   页面挂载时模拟"加载用户数据"
+  useEffect(() => {
+    setLoading(true);
+    // 模拟 500ms 网络请求（真实 KRN 里是 request.get('/rest/...')）
+    setTimeout(() => {
+      setLoading(false);
+      appendLog('页面数据加载完成');
+    }, 500);
+  }, [appendLog]);
+
+  // ─── 事件处理 ──────────────────────────────────────────────────────────
+
+  // ★ Follow 按钮：纯 React state 切换，无 Bridge 调用
+  const handleFollowPress = useCallback(() => {
+    const next = !hasFollowed;
+    setHasFollowed(next);
+    appendLog(`Follow 状态切换 → ${next ? 'Following' : 'Unfollowed'}`);
+  }, [hasFollowed, appendLog]);
+
+  // ★ Bridge 演示1：调 Native 弹 Toast
+  //   KRN 对应：yoda.invoke('live.showToast', { msg: '...' })
+  //   本 Demo：yoda.invoke('YodaBridge.showToast', { msg: '...' })
+  const handleNativeToast = useCallback(async () => {
+    appendLog('调用 Native Toast...');
+    try {
+      await yoda.invoke('YodaBridge.showToast', {
+        msg: `Hello from RN! hasFollowed=${hasFollowed}`,
+      });
+      appendLog('✅ Native Toast 调用成功');
+    } catch (e) {
+      appendLog(`❌ Bridge 调用失败: ${String(e)}`);
+    }
+  }, [hasFollowed, appendLog]);
+
+  // ★ Bridge 演示2：调 Native 获取设备信息（有返回值的 invoke）
+  //   KRN 对应：yoda.invoke('device.getInfo', {})
+  //   Native 返回 JSON → Promise resolve → React state 更新
+  const handleGetDeviceInfo = useCallback(async () => {
+    appendLog('获取设备信息...');
+    try {
+      const result = (await yoda.invoke('YodaBridge.getDeviceInfo', {})) as DeviceInfo;
+      setDeviceInfo(result);
+      appendLog(`✅ 设备信息: ${result.model} / ${result.os}`);
+    } catch (e) {
+      appendLog(`❌ 获取失败: ${String(e)}`);
+    }
+  }, [appendLog]);
+
+  // ─── 渲染 ──────────────────────────────────────────────────────────────
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* 顶部：Header（对照 BriefProfile topWrapper）*/}
+      <View style={styles.header}>
+        <View style={styles.avatarPlaceholder}>
+          <Text style={styles.avatarText}>👤</Text>
+        </View>
+        <Text style={styles.nickname}>{nickname}</Text>
+        <Text style={styles.subtitle}>Hello KRN Demo Page</Text>
+      </View>
+
+      {/* Loading 指示器（对照 BriefProfile loading 状态）*/}
+      {loading && (
+        <View style={styles.loadingRow}>
+          <ActivityIndicator size="small" color="#8d5cff" />
+          <Text style={styles.loadingText}>加载中...</Text>
+        </View>
+      )}
+
+      {/* Follow 按钮（对照 BriefProfile handleFollowPress）*/}
+      <TouchableOpacity
+        style={[styles.button, hasFollowed ? styles.buttonFollowing : styles.buttonFollow]}
+        onPress={handleFollowPress}
+        activeOpacity={0.8}>
+        <Text style={styles.buttonText}>
+          {hasFollowed ? '✓ Following' : '+ Follow'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* 分割线 */}
+      <View style={styles.divider} />
+
+      {/* Bridge 演示区 */}
+      <Text style={styles.sectionTitle}>Bridge 调用演示</Text>
+      <Text style={styles.sectionDesc}>
+        对照 KRN：yoda.invoke('YodaBridge.xxx', params){'\n'}
+        下面两个按钮直接调 Android Native 方法
+      </Text>
+
+      {/* Bridge 按钮1：Toast */}
+      <TouchableOpacity
+        style={[styles.button, styles.buttonBridge]}
+        onPress={handleNativeToast}
+        activeOpacity={0.8}>
+        <Text style={styles.buttonText}>📣 Call Native Toast</Text>
+      </TouchableOpacity>
+
+      {/* Bridge 按钮2：获取设备信息 */}
+      <TouchableOpacity
+        style={[styles.button, styles.buttonBridge]}
+        onPress={handleGetDeviceInfo}
+        activeOpacity={0.8}>
+        <Text style={styles.buttonText}>📱 Get Device Info</Text>
+      </TouchableOpacity>
+
+      {/* 设备信息展示 */}
+      {deviceInfo && (
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Native 返回的设备信息：</Text>
+          <Text style={styles.infoText}>型号：{deviceInfo.model}</Text>
+          <Text style={styles.infoText}>系统：{deviceInfo.os}</Text>
+          <Text style={styles.infoText}>App 版本：{deviceInfo.appVersion}</Text>
+        </View>
+      )}
+
+      {/* 日志区：显示 invoke 调用链路 */}
+      <View style={styles.divider} />
+      <Text style={styles.sectionTitle}>调用日志</Text>
+      {log.map((entry, i) => (
+        <Text key={i} style={styles.logEntry}>
+          {entry}
+        </Text>
+      ))}
+
+      <View style={styles.bottomPadding} />
+    </ScrollView>
+  );
+};
+
+// ─── 样式（对照 KRN 里的 StyleSheet.create，原理和 convertStyles(SrcStyles) 一样）─
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: 24,
+    backgroundColor: '#16213e',
+  },
+  avatarPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#2d2d5e',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  avatarText: {
+    fontSize: 36,
+  },
+  nickname: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#8888aa',
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 8,
+  },
+  loadingText: {
+    color: '#8888aa',
+    fontSize: 13,
+    marginLeft: 8,
+  },
+  button: {
+    marginHorizontal: 20,
+    marginVertical: 8,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonFollow: {
+    backgroundColor: '#8d5cff',
+  },
+  buttonFollowing: {
+    backgroundColor: '#2d2d5e',
+    borderWidth: 1,
+    borderColor: '#8d5cff',
+  },
+  buttonBridge: {
+    backgroundColor: '#0f3460',
+    borderWidth: 1,
+    borderColor: '#4488ff',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#2d2d5e',
+    marginHorizontal: 20,
+    marginVertical: 16,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginHorizontal: 20,
+    marginBottom: 6,
+  },
+  sectionDesc: {
+    fontSize: 12,
+    color: '#6666aa',
+    marginHorizontal: 20,
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+  infoCard: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    padding: 14,
+    backgroundColor: '#0d2137',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#4488ff',
+  },
+  infoTitle: {
+    fontSize: 13,
+    color: '#4488ff',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#ccccee',
+    marginBottom: 4,
+  },
+  logEntry: {
+    fontSize: 11,
+    color: '#6688aa',
+    marginHorizontal: 20,
+    marginVertical: 2,
+    fontFamily: 'monospace',
+  },
+  bottomPadding: {
+    height: 40,
+  },
+});
+
+export default HelloScreen;

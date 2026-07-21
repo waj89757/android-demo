@@ -1145,3 +1145,301 @@ Choreographer 用同步屏障让渲染插队；最终所有指令都汇聚到 Ap
     贯穿全章的一个思想——控制反转：
       Adapter 的 onBindViewHolder、Fragment 的 onCreateView，
       都不是你主动调，而是你"填空"、框架"决定何时调"。
+
+
+---
+
+二十七、DiffUtil / ListAdapter 差异更新全景（DiffUtilDemoActivity 实战）
+
+本章基于 DiffUtilDemoActivity（商品列表：改一条/插入/删除/打乱四个按钮）整理，
+核心是搞清楚"列表数据变化时，怎么只刷新变化的部分并带动画"。
+
+27.1 要解决的痛点：notifyDataSetChanged 太粗暴
+
+    列表数据变了，最省事的写法：
+      data = newList
+      adapter.notifyDataSetChanged()   // 全部重刷
+
+    三个问题：
+      1. 没有增删动画，item 直接闪一下
+      2. 丢失滚动位置、丢失 item 选中状态
+      3. 性能差：明明只改1条，却把屏幕上所有 item 全 onBindViewHolder 一遍
+
+27.2 DiffUtil 的核心：只需回答两个问题
+
+    DiffUtil 逐对比较新旧列表元素，问你两个问题：
+
+    问题1  areItemsTheSame(old, new)
+      "这两个是不是同一个东西？"（通常比唯一 id）
+      → 判断是"同一 item 内容变了"还是"完全不同的两个 item"
+
+    问题2  areContentsTheSame(old, new)
+      "既然是同一个，它的内容变了吗？"（比全部字段，data class 用 == 即可）
+      → 决定要不要重新 onBindViewHolder（更新动画）
+
+    两个问题的组合结论：
+      itemsSame=false          → 一个删除 + 一个新增
+      itemsSame=true,contentsSame=false → 就地更新这一条
+      itemsSame=true,contentsSame=true  → 完全不动
+
+27.3 ListAdapter：把 DiffUtil 封装到极致
+
+    Google 把 DiffUtil 封进 ListAdapter，你连 notify 都不用调：
+
+    普通 Adapter                 ListAdapter
+    ────────────────────         ─────────────────────────
+    自己维护 mutableList          内部自己存，getItem(pos) 取
+    自己写 getItemCount()         自动
+    自己调 notifyXxx()            submitList 全自动
+
+    三个关键点：
+      class XxxAdapter : ListAdapter<T, VH>(XxxDiffCallback())
+      onBindViewHolder 里用 getItem(position) 取数据
+      更新数据只调 adapter.submitList(新list)
+
+27.4 submitList 之后发生什么（源码链路）
+
+    你的 Activity
+      adapter.submitList(list.toList())
+        ↓
+    ListAdapter.submitList()  → 转发给内部的 AsyncListDiffer
+        ↓
+    AsyncListDiffer 开后台线程
+        ↓（子线程）
+    DiffUtil.calculateDiff()  逐对调你的 areItemsTheSame/areContentsTheSame
+        → 算出 DiffResult（谁插/删/移/改的清单）
+        ↓（切回主线程，用 mainThreadExecutor）
+    DiffResult.dispatchUpdatesTo(callback)
+        ↓
+    AdapterListUpdateCallback（框架类，构造 ListAdapter 时用它包住了你的 adapter）
+        onInserted → mAdapter.notifyItemRangeInserted()
+        onRemoved  → mAdapter.notifyItemRangeRemoved()
+        onMoved    → mAdapter.notifyItemMoved()
+        onChanged  → mAdapter.notifyItemRangeChanged()
+        ↓
+    RecyclerView 精确刷新 + 播放动画
+
+    关键认知：
+      你找的 notifyItemInserted/Removed/Moved/Changed 不在你代码里，
+      在框架的 AdapterListUpdateCallback 类里，框架替你调
+      差异计算在子线程（大列表不卡 UI），notify/刷 UI 切回主线程（Android 铁律）
+
+27.5 一个必踩的坑：必须传新的 list 引用
+
+    错误：直接改原 list 再 submit 同一个引用
+      list.add(x)
+      adapter.submitList(list)   // 新旧是同一个对象，DiffUtil 可能不刷新
+
+    正确：每次 submit 一个新 list
+      adapter.submitList(list.toList())   // 或 ArrayList(list)
+      DiffUtil 需要"旧引用"和"新引用"不同才能对比
+
+27.6 不用 DiffUtil 会怎么写（对比才知道价值）
+
+    路线一 粗暴版：普通 Adapter 自己存 list，每次 notifyDataSetChanged() 全刷
+      → 短，但无动画、丢滚动位置、性能差
+
+    路线二 手动精确版：每次操作前自己判断插入/删除/更新/移动
+      改一条：indexOfFirst 找位置 → notifyItemChanged(index)
+      插入：  list.add(i,x) → notifyItemInserted(i) + notifyItemRangeChanged(后续)
+      删除：  removeAt(0) → notifyItemRemoved(0) + notifyItemRangeChanged(后续)
+      打乱：  最痛苦，要两两比对算 move，notifyItemMoved 会连锁改索引，极易算错崩溃
+
+    → DiffUtil 就是把"手动精确版"里最难最易错的部分（对比新旧、算增删移改、
+      处理连锁位置变化）全自动化，你只回答两个问题，剩下它精确地替你 notify
+
+27.7 三种写法对照表
+
+    维度              notifyDataSetChanged   手动精确版        DiffUtil/ListAdapter
+    ───────────────   ────────────────────   ──────────────   ────────────────────
+    数据 list          自己维护                自己维护          ListAdapter 内部管
+    找位置             不用                    自己 indexOf     自动
+    调 notify         一句全刷                自己调对的        自动
+    动画              无                      有(算对才行)      有
+    打乱/移动          无动画                  极易算错崩溃      自动、稳
+    后续位置连锁变化    不用管                  必须手动 range   自动
+    代码量            少但粗暴                多且易错          少且安全
+
+27.8 一句话总纲
+
+    列表会变化的场景优先用 DiffUtil/ListAdapter：
+    继承 ListAdapter + 写一个 DiffUtil.ItemCallback（回答"是否同一个 id"和"内容是否相同"）
+    + 更新只调 submitList(新list)。
+    差异计算、精确 notify、增删移改动画，框架全自动，还免去手动算 position 的崩溃风险。
+
+
+---
+
+二十八、React Native / KRN 接入全景（KRN Demo + React Playground）
+
+本章基于两个 demo：
+  1. krn/hello-krn/     → 标准开源 RN 接入，含 JS↔Native Bridge 调用
+  2. react-playground/  → 纯前端环境，理解 JSX/Babel/React 编译原理
+
+28.1 核心概念链（从 JS 到屏幕的完整路径）
+
+    你写的 .tsx 文件
+      ↓ Babel（翻译单文件：JSX→createElement，TS类型擦除，ES6→ES5）
+      ↓ Metro（打包器：追踪所有 import，合并441个模块，加模块系统，压缩变量名）
+    index.android.bundle（836KB，打进 APK 的 assets/）
+      ↓ KRNActivity 启动
+      ↓ Hermes 引擎（libhermes.so，打在 APK 里的 C++ JS 引擎）
+      ↓ mmap 读入 bundle，执行 __r(0) 触发 AppRegistry
+      ↓ React 渲染虚拟 DOM → Shadow线程(Yoga)计算布局 → 主线程更新原生 View
+    屏幕显示
+
+28.2 文件扩展名的含义
+
+    .js   普通 JavaScript
+    .ts   TypeScript（有类型）
+    .jsx  JavaScript + JSX 标签语法
+    .tsx  TypeScript + JSX（最常见，RN 页面用这个）
+
+    口诀：t = 类型(Types)，x = 标签(taX)
+
+28.3 JS 生态三个工具的职责
+
+    TypeScript → 编译时类型检查，tsc 把 .ts 变 .js（擦除类型）
+    Babel      → 语法翻译：JSX→React.createElement，新语法→旧语法
+    Metro      → 打包器：多文件→单 bundle，调用 Babel 翻译每个文件
+
+    JSX 不是 JS 语法，是 Babel 的语法糖。
+    没有 Babel，<View> 这种写法直接报错。
+
+28.4 React Native 的线程模型（Android侧）
+
+    主线程（Main Thread）  ← 原生 View 创建/更新，Android 生命周期
+    JS 线程（mqt_js）      ← Hermes 执行所有 JS/React 代码，单线程
+    NativeModules 线程     ← 分发 @ReactMethod 调用（你的 Kotlin 方法在这跑）
+    Shadow 线程（Yoga）    ← C++ 计算 flexbox 布局 → 输出每个 View 的像素坐标
+
+    一次点击的线程路径：
+      主线程（触摸事件）→ JS线程（handlePress）→ Shadow线程（Yoga布局）→ 主线程（更新View）
+
+28.5 Hermes JS Heap 与 Android 内存的关系
+
+    Android 进程虚拟内存
+    ├── ART Java Heap（受 -Xmx 限制）← KRNActivity/ReactInstanceManager 等 Java 对象
+    ├── Native Heap（C/C++ malloc）   ← Hermes JS Heap 在这里
+    │   └── Hermes JS Heap
+    │       ├── useState 的 state 值
+    │       ├── useCallback 产生的闭包
+    │       └── 虚拟 DOM 树（每次 render 重建，Diff 后旧树 GC）
+    └── mmap 区域                     ← index.android.bundle（按页懒加载）
+
+    Android Studio Profiler 里：
+      JS 对象 → 显示在 "Native" 那行（不在 "Java" 那行）
+
+28.6 Bundle 的构成（836KB 的内容）
+
+    ① 头部 Prelude（1-3行）   → __DEV__=false，设置全局环境变量
+    ② 模块系统 Runtime（1行）  → __d(注册模块) / __r(运行模块)，Metro 自造的 require 系统
+    ③ Polyfills（5-60行）     → 补齐 Hermes 缺失的 JS 标准能力（Promise/console等）
+    ④ React 库（~97KB）       → useState/createElement/虚拟DOM Diff
+    ⑤ React Native 框架（~99KB）→ View/Text/NativeModules 的 JS 实现
+    ⑥ 你的代码（第487行，<1%）→ HelloScreen + yoda + index
+    ⑦ 启动入口（最后行）       → __r(0) 触发 index.js
+
+    关键认知：bundle 里 441 个模块，你自己写了 3 个，其余 438 个是 React + RN 框架。
+
+28.7 热更新原理（bundle 就是一个文件，替换即生效）
+
+    路径 A（随 APK 更新）  → 新 bundle 打进新 APK，用户去商店更新（周级）
+    路径 B（热更新 OTA）   → 后台下载新 bundle 到 /data/data/.../krn/bundles/
+                              下次打开页面加载新版本，绕过应用市场，分钟级发布
+
+    加载优先级：本地热更新文件 > APK 内置 assets/index.android.bundle
+    安全机制：MD5校验 + 版本号检查 + RN版本兼容性校验
+
+28.8 Bridge 通信标准（JS → Native）
+
+    标准接口：NativeModules（react-native 内置）
+      JS:     NativeModules.YodaBridge.showToast(jsonStr, successCb, errorCb)
+      Kotlin: @ReactMethod fun showToast(paramsJson: String, success: Callback, error: Callback)
+
+    消息流程：
+      JS 写入 MessageQueue（带 moduleID + methodID + callbackID）
+        → C++ Bridge 线程轮询 → 反射调用 Kotlin @ReactMethod
+        → Callback.invoke(result) → Bridge 回传 → JS Promise resolve
+
+    NativeModules['YodaBridge'] 不是真正的 Kotlin 对象，
+    是 RN 框架在 App 启动时自动生成的 JS 镜像（序列化自 getName() + @ReactMethod）。
+
+28.9 Android 侧关键类
+
+    Application 层（全局唯一）：
+      ReactApplication       接口，要求提供 ReactNativeHost
+      DefaultReactNativeHost 配置中心：注册 Package、bundle 文件名、开发模式
+      SoLoader               加载 libhermes.so 等 .so 文件（必须最先调用）
+
+    Activity 层（页面级）：
+      ReactActivity          RN 页面容器基类，内部创建 ReactRootView
+      ReactActivityDelegate  委托对象，loadApp(componentName) 触发渲染
+
+    Bridge 层（你扩展的部分）：
+      ReactContextBaseJavaModule  所有自定义 Module 的基类，getName() = JS的键名
+      @ReactMethod               暴露给 JS 的方法注解，没有这个注解 JS 看不到
+      Callback                   Bridge 回调，对应 JS 的函数参数，只能调一次
+      ReactPackage               模块注册容器：createNativeModules() 交出 Module 列表
+      MainReactPackage           RN 内置包（含 setTimeout/fetch/UIManager 等约20个模块）
+
+28.10 Package 和 Module 的关系
+
+    Module = 工人（真正干活）：一个 Module 对应 JS 里一个 NativeModules.xxx 对象
+    Package = 工头（负责登记）：把一组 Module 打包，交给 RN 框架
+
+    RN 启动时遍历 getPackages() → 对每个 Package 调 createNativeModules()
+    → 汇总成「moduleID → Module」表 → 序列化传给 JS → 构建 NativeModules 对象
+
+28.11 JS 侧文件结构（你的例子）
+
+    运行时文件（进 bundle）：
+      index.js           → 入口，AppRegistry.registerComponent('HelloKRN', ...)
+      src/HelloScreen.tsx → 页面：useState/useEffect/useCallback + View/Text/TouchableOpacity
+      src/yoda.ts        → Bridge封装层：NativeModules + Callback → yoda.invoke(dotPath, params) Promise
+
+    构建配置文件（不进 bundle）：
+      package.json       → 依赖清单，运行时只需 react + react-native 两个包
+      babel.config.js    → 翻译规则（JSX + TypeScript）
+      metro.config.js    → 打包规则
+      tsconfig.json      → 类型检查（noEmit=true，只检查不编译，编译由Babel做）
+
+28.12 yoda 的设计思路
+
+    快手 KRN：yoda.invoke('live.showToast', { msg: '...' })
+    本 Demo：  yoda.invoke('YodaBridge.showToast', { msg: '...' })
+
+    yoda.ts 是在 NativeModules 标准上加的封装层：
+      ① 把 dotPath 字符串拆成 moduleName + methodName
+      ② 把丑陋的 Callback 包成 Promise（支持 async/await）
+      ③ 加模块不存在时的错误处理
+
+    底层差异：
+      快手 @yoda/bridge → JSI 直接 C++ 内存访问（高效）
+      本 Demo yoda.ts   → 标准 NativeModules + JSON 序列化（简单易理解）
+      对外 API 形状完全一样，等有内网权限，把 import 换成 @yoda/bridge 即可接入真实 KRN。
+
+28.13 react-playground 的作用（理解编译原理）
+
+    src/App.tsx（你写的）
+      ↓ npm run build（Babel 编译）
+    dist/App.js（浏览器可执行）
+      ↓ 直接用 React CDN
+    index.html 在浏览器跑
+
+    通过对比 src/App.tsx 和 dist/App.js 亲眼看到：
+      JSX <div> → React.createElement("div", ...)
+      useState<number> → useState()（类型被擦除）
+      const/箭头函数 → ES5 function（视 preset 配置）
+
+28.14 一句话总纲
+
+    RN = 两个 .aar 依赖（react-android + hermes-android）
+       + 自建 3 条线程（JS/NativeModules/Shadow）
+       + 一套 Bridge 机制（NativeModules/MessageQueue/@ReactMethod）
+       + 一个 bundle 文件（Metro 打包，Hermes 执行，可热更新）
+
+    KRN = 快手在开源 RN 基础上做了：
+      yoda(@yoda/bridge) 替换 NativeModules（更简洁的 API + JSI 高性能）
+      统一的容器 Activity 接入深链路由（kleao://krn?componentName=xxx）
+      热更新基础设施（bundle 版本管理 + 后台下载 + fallback 机制）

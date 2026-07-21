@@ -1,0 +1,15 @@
+{
+  "name": "react-playground",
+  "version": "1.0.0",
+  "description": "亲手体验 JSX/TSX 被 Babel 编译成纯 JS 的过程",
+  "scripts": {
+    "build": "babel src --out-dir dist --extensions .tsx,.ts",
+    "watch": "babel src --out-dir dist --extensions .tsx,.ts --watch"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
+    "@babel/preset-typescript": "^7.24.0"
+  }
+}

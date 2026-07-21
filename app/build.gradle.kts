@@ -33,6 +33,28 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    // ★ React Native 打包：排除冲突的 META-INF 文件
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/*.kotlin_module"
+            )
+            pickFirsts += listOf(
+                "lib/x86/libc++_shared.so",
+                "lib/x86_64/libc++_shared.so",
+                "lib/armeabi-v7a/libc++_shared.so",
+                "lib/arm64-v8a/libc++_shared.so"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -66,6 +88,12 @@ dependencies {
 
     // ★ LocalBroadcastManager（App 内部广播，不经过 AMS）
     implementation(libs.localbroadcastmanager)
+
+    // ★★★ React Native 0.73 集成 ★★★
+    // react-android：RN 核心运行时（ReactRootView / ReactActivity / NativeModules）
+    implementation("com.facebook.react:react-android:0.73.6")
+    // hermes-android：Hermes JS 引擎（0.73 默认用 Hermes，比 JSC 更快更省内存）
+    implementation("com.facebook.react:hermes-android:0.73.6")
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

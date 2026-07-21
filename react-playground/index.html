@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Playground - JSX 编译体验</title>
+</head>
+<body>
+  <!-- ① React 页面会被挂载到这个空 div 里 -->
+  <div id="root"></div>
+
+  <!-- ② 从 CDN 引入 React 库本体（运行时需要它，因为编译后代码里有 React.createElement） -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- ③ 引入【Babel 编译后】的纯 JS 文件（不是 App.tsx！浏览器不认识 tsx） -->
+  <script src="./dist/App.js"></script>
+</body>
+</html>

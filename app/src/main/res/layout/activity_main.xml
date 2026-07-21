@@ -296,6 +296,14 @@
             android:backgroundTint="#00897B"
             android:layout_marginTop="6dp" />
 
+        <Button
+            android:id="@+id/btn_krn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KRN 演示 (真实 React Native + Bridge)"
+            android:backgroundTint="#C62828"
+            android:layout_marginTop="6dp" />
+
         <!-- 列表控件 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list"

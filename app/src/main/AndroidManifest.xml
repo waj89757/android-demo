@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -154,6 +155,12 @@
         <activity
             android:name=".DiffUtilDemoActivity"
             android:exported="false" />
+
+        <!-- ★★★ KRN 演示：真实 React Native 页面 ★★★ -->
+        <activity
+            android:name=".KRNActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".RNContainerActivity"
