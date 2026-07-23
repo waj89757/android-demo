@@ -1443,3 +1443,170 @@ Choreographer 用同步屏障让渲染插队；最终所有指令都汇聚到 Ap
       yoda(@yoda/bridge) 替换 NativeModules（更简洁的 API + JSI 高性能）
       统一的容器 Activity 接入深链路由（kleao://krn?componentName=xxx）
       热更新基础设施（bundle 版本管理 + 后台下载 + fallback 机制）
+
+
+---
+
+二十九、Gradle 构建系统
+
+29.1 文件格式说明
+
+    .kts（Kotlin Script）：Gradle 构建脚本格式，用 Kotlin 语言编写。
+      历史：Gradle 脚本原来用 Groovy 写（build.gradle），现在推荐 Kotlin DSL（build.gradle.kts）。
+      优点：IDE 有完整类型检查和自动补全，改错了编译期报错，不用学 Groovy。
+
+    .toml（Tom's Obvious, Minimal Language）：配置文件格式，和 JSON/YAML 是同类。
+      专为配置设计：比 JSON 支持注释，比 YAML 不容易因缩进出错。
+      在 Gradle 里用于 gradle/libs.versions.toml，集中管理所有依赖版本号。
+
+29.2 根目录三个关键文件
+
+    settings.gradle.kts — 项目目录（Gradle 启动第一个读）
+      两件事：1. 声明插件/依赖仓库地址；2. 注册项目包含哪些模块。
+        pluginManagement { repositories { google(); mavenCentral() } }
+        dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+        rootProject.name = "demo01"
+        include(":app", ":core", ":network", ":feature-demo", ":feature-krn")
+      没有 include 的目录，Gradle 完全不认识。
+
+    build.gradle.kts（根目录）— 公共插件声明
+      只做一件事：声明所有模块用到的插件版本，但用 apply false 不在根模块激活。
+        plugins {
+            alias(libs.plugins.android.application) apply false
+            alias(libs.plugins.kotlin.android) apply false
+        }
+      目的：锁定版本号到一处，子模块用 id("com.android.library") 继承此版本，不重复写。
+
+    gradle.properties — JVM 和编译参数（键值对配置）
+      org.gradle.jvmargs=-Xmx2048m    → 给 Gradle 守护进程 2GB 内存（编译慢可以调大）
+      android.useAndroidX=true         → 使用 AndroidX 命名空间
+      android.nonTransitiveRClass=true → 每个 library 只生成自己资源的 R 类
+
+29.3 libs.versions.toml — 版本目录（Version Catalog）
+
+    解决的问题：5 个模块都用 Retrofit，版本号散落在 5 个文件里，改一次要改 5 处。
+    解决方式：所有版本号集中在一个文件，子模块引用别名。
+
+    文件结构：
+      [versions]
+      retrofit = "2.9.0"                   ← 版本号只写一次
+
+      [libraries]
+      retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+
+      [plugins]
+      android-application = { id = "com.android.application", version.ref = "agp" }
+
+    子模块里使用：
+      implementation(libs.retrofit)        ← toml 里 - 变成 .
+      implementation(libs.retrofit.gson)   ← retrofit-gson → libs.retrofit.gson
+
+29.4 模块 build.gradle.kts — 四大区块
+
+    区块1：plugins — 告诉 Gradle 这个模块是什么
+      id("com.android.application")  → 可安装 APK 模块，整个项目只能有一个
+      id("com.android.library")      → 库模块（产物是 AAR），可被其他模块依赖
+      id("org.jetbrains.kotlin.android") → 支持 Kotlin
+
+    区块2：android {} — Android 特有配置
+      namespace    → R 类的包名（资源 ID 的命名空间）
+      compileSdk   → 编译时可调用哪些 API（不影响运行时）
+      applicationId → App 在手机和商店的唯一标识（只有 application 模块有）
+      minSdk       → 最低支持的 Android 版本，低于此的手机无法安装
+      targetSdk    → 告诉系统按哪个版本行为规则运行
+      versionCode  → 整数，用于版本升级比较（必须递增）
+      versionName  → 展示给用户的版本号字符串
+
+    区块3：dependencies {} — 声明依赖
+      implementation(libs.retrofit)         → 打进 APK，只对本模块可见
+      api(libs.xxx)                          → 打进 APK，对依赖本模块的上层也可见
+      testImplementation(libs.junit)         → 仅单元测试，不进 APK
+      androidTestImplementation(libs.espresso) → 仅仪器测试，不进 APK
+      implementation(project(":network"))    → 依赖本项目的其他模块
+
+    区块4：packaging {} — 打包冲突处理
+      多个依赖库都包含同名文件时：
+      excludes → 直接丢掉（META-INF 文件）
+      pickFirsts → 遇到冲突取第一个（libc++_shared.so）
+
+29.5 implementation vs api（最容易踩坑）
+
+    implementation：只有本模块能见到这个依赖（不透传）
+    api：本模块 + 所有依赖本模块的上层都能见到（透传）
+
+    本项目的例子：
+      feature-krn 用 api("com.facebook.react:react-android")
+      因为 app 里的 MainApplication 直接使用了 ReactApplication / ReactNativeHost
+      若改成 implementation，app 编译时看不到这些类 → 报错
+
+    原则：优先用 implementation；只有明确需要上层使用某个类时才用 api。
+
+29.6 常用 Plugin 清单
+
+    Android 官方：
+      com.android.application   → APK 模块
+      com.android.library        → AAR 库模块
+
+    语言支持：
+      org.jetbrains.kotlin.android  → Kotlin 基础支持
+      org.jetbrains.kotlin.kapt     → 注解处理（Room/Dagger 需要）
+      com.google.devtools.ksp        → kapt 的现代替代，更快
+
+    功能增强：
+      org.jetbrains.kotlin.plugin.compose → Jetpack Compose UI
+      com.google.dagger.hilt.android      → Hilt 依赖注入
+      com.google.gms.google-services      → Firebase/Google 服务
+
+29.7 编译命令与产物
+
+    常用命令：
+      ./gradlew assembleDebug    → 编译 debug 包（最常用）
+      ./gradlew assembleRelease  → 编译 release 包（需要签名证书）
+      ./gradlew clean            → 清除 build 目录
+
+    编译流程：
+      .kt 源码 → Kotlin 编译器 → .class（JVM 字节码）
+      → D8/R8 → .dex（Dalvik 字节码，Android 专用）
+      → aapt2 处理资源（res/ 二进制化，生成 resources.arsc）
+      → APK 打包（dex + res + assets + so + Manifest）
+      → zipalign（4字节内存对齐）+ apksigner（签名）
+      → app-debug.apk
+
+    产物位置：
+      :app                → app/build/outputs/apk/debug/app-debug.apk
+      :core/:network 等   → module/build/outputs/aar/module-debug.aar
+
+    APK 内部结构（本质是 ZIP）：
+      classes.dex ～ classes8.dex  → 所有代码（你的 + 所有依赖库）
+      lib/arm64-v8a/*.so            → Native C++ 库（RN 的 libhermes.so 等）
+      assets/index.android.bundle  → RN JS Bundle
+      res/                          → 编译后的资源（二进制 XML）
+      resources.arsc                → 资源 ID 索引表
+      AndroidManifest.xml           → 应用配置（二进制化）
+
+    多模块编译优势：
+      改了 :network，只重新编译 :network 和 :app，:feature-krn 完全不动。
+      项目越大，模块化对编译速度的提升越显著。
+
+29.8 adb install 安装过程
+
+    步骤1：adb 把 APK 原样复制到手机 /data/local/tmp/
+    步骤2：PackageManagerService（PMS）接管：
+      - 验证签名
+      - 解析 AndroidManifest.xml，写入系统数据库
+      - 把 APK 移动到 /data/app/com.example.demo01-xxx/base.apk（原样保留，不解压）
+      - 解压 .so 文件到 /data/app/.../lib/arm64-v8a/（.so 必须解压，linker 需要文件路径）
+      - dex2oat：把 classes.dex 编译成 .odex（CPU 直接执行的机器码，这是进度条卡住原因）
+    步骤3：安装完成，APK 文件永久存在手机里
+
+    运行时加载：
+      - 优先加载 .odex（机器码，快）；odex 失效回退读 base.apk 里的 .dex（慢）
+      - .so 直接 dlopen() 加载（已解压，有文件路径）
+      - 资源读取：不解压，直接 mmap APK 内部偏移量（zipalign 4字节对齐是为此）
+
+    .so 重复问题：
+      系统库（libc.so/libssl.so）在 /system/lib64/ 所有 App 共用，不重复。
+      第三方库（libhermes.so）每个 App 各打一份，无法共享。
+      原因：进程沙箱隔离，不同 App 版本不同，Android 无跨 App 共享第三方 .so 机制。
+      Play 商店通过 ABI splitting 只下发对应架构的 .so（APK 从 130MB 降至 ~35MB）。
+
