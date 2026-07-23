@@ -30,140 +30,135 @@
         android:theme="@style/Theme.Demo01"
         tools:targetApi="31">
 
+        <!-- ══════════════════════════════════════════════════
+             feature-demo 模块的组件（包名 com.example.demo）
+             重构后从 com.example.demo01 迁移到此模块
+        ══════════════════════════════════════════════════ -->
+
         <activity
-            android:name=".SecondActivity"
+            android:name="com.example.demo.SecondActivity"
             android:exported="false" />
         <activity
-            android:name=".FragmentDemoActivity"
+            android:name="com.example.demo.FragmentDemoActivity"
             android:exported="false" />
         <activity
-            android:name=".ViewPagerDemoActivity"
+            android:name="com.example.demo.ViewPagerDemoActivity"
             android:exported="false" />
         <activity
-            android:name=".NetworkDemoActivity"
+            android:name="com.example.demo.NetworkDemoActivity"
             android:exported="false" />
         <activity
-            android:name=".ViewModelDemoActivity"
+            android:name="com.example.demo.ViewModelDemoActivity"
             android:exported="false" />
         <activity
-            android:name=".LiveDataCompareActivity"
+            android:name="com.example.demo.LiveDataCompareActivity"
             android:exported="false" />
         <activity
-            android:name=".MvpDemoActivity"
+            android:name="com.example.demo.MvpDemoActivity"
             android:exported="false" />
 
         <!--
         ★★★ DeepLink 核心配置 ★★★
-
         android:exported="true" 必须设为 true，
         因为这个 Activity 要接收来自系统/外部的 Intent。
-        exported=false 的 Activity 只能被同一个 App 内部启动。
-
-        intent-filter 告诉 Android 系统：
-          "当有人想用 VIEW 动作打开 demo01://post 这个 URL 时，
-           请启动我（DeepLinkDemoActivity）"
-
-        Android 在 App 安装时扫描所有 intent-filter，
-        建立一张"URL pattern → Activity"的路由表，
-        之后收到匹配的 URL 就来找这里。
         -->
         <activity
-            android:name=".DeepLinkDemoActivity"
+            android:name="com.example.demo.DeepLinkDemoActivity"
             android:exported="true">
-
             <intent-filter>
-                <!-- ACTION_VIEW：表示"查看/打开某个内容"，DeepLink 固定用这个 -->
                 <action android:name="android.intent.action.VIEW" />
-
-                <!-- DEFAULT：允许通过隐式 Intent 匹配 -->
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <!-- BROWSABLE：允许从浏览器点链接触发（不加这个，浏览器里点链接不会触发）-->
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!--
-                ★ 声明这个 Activity 处理哪种 URL 格式：
-                   scheme="demo01" + host="post"
-                   → 匹配 demo01://post 和 demo01://post?任意参数
-
-                   完整例子：demo01://post?id=123&title=HelloWorld
-                -->
                 <data
                     android:scheme="demo01"
                     android:host="post" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".AmsDemoActivity"
+            android:name="com.example.demo.AmsDemoActivity"
             android:exported="false" />
         
         <!-- ★★★ Service 注册 ★★★ -->
         <service
-            android:name=".MockPushService"
+            android:name="com.example.demo.MockPushService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
         
         <activity
-            android:name=".ServiceDemoActivity"
+            android:name="com.example.demo.ServiceDemoActivity"
             android:exported="false" />
         
         <activity
-            android:name=".HandlerDemoActivity"
+            android:name="com.example.demo.HandlerDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".SurfaceDemoActivity"
+            android:name="com.example.demo.SurfaceDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".BroadcastDemoActivity"
+            android:name="com.example.demo.BroadcastDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ContentProviderDemoActivity"
+            android:name="com.example.demo.ContentProviderDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".WebViewDemoActivity"
+            android:name="com.example.demo.WebViewDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".OfflineDemoActivity"
+            android:name="com.example.demo.ProfileActivity"
+            android:exported="false" />
+
+        <!-- ★ Wanas 首页（Fragment + BottomNav + RecyclerView 多类型练习） -->
+        <activity
+            android:name="com.example.demo.WanasActivity"
+            android:exported="false" />
+
+        <!-- ★ DiffUtil / ListAdapter 演示（商品列表增删改动画） -->
+        <activity
+            android:name="com.example.demo.DiffUtilDemoActivity"
+            android:exported="false" />
+
+        <!--
+        ★★★ ContentProvider 注册 ★★★
+        authorities：全局唯一标识，相当于域名，调用方通过它找到这个 Provider
+        exported：false = 仅 App 内部使用
+        -->
+        <provider
+            android:name="com.example.demo.NoteContentProvider"
+            android:authorities="com.example.demo01.notes"
+            android:exported="false" />
+
+        <!-- ══════════════════════════════════════════════════
+             feature-krn 模块的组件（包名 com.example.krn）
+        ══════════════════════════════════════════════════ -->
+
+        <activity
+            android:name="com.example.krn.OfflineDemoActivity"
             android:exported="false" />
 
         <activity
-            android:name=".HotUpdateDemoActivity"
+            android:name="com.example.krn.HotUpdateDemoActivity"
             android:exported="false" />
+
+        <!-- ★★★ KRN 演示：真实 React Native 页面 ★★★ -->
+        <activity
+            android:name="com.example.krn.KRNActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!--
             ★★★ RN 容器 Activity：支持两种启动方式
             1. Native 内部：startActivity + putExtra("uri", "myapp://...")
             2. DeepLink：浏览器/Push 打开 myapp:// URI，系统自动路由到此 Activity
         -->
-        <!-- ★ 用户个人资料页（Figma UI 练习） -->
         <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-
-        <!-- ★ Wanas 首页（Fragment + BottomNav + RecyclerView 多类型练习） -->
-        <activity
-            android:name=".WanasActivity"
-            android:exported="false" />
-
-        <!-- ★ DiffUtil / ListAdapter 演示（商品列表增删改动画） -->
-        <activity
-            android:name=".DiffUtilDemoActivity"
-            android:exported="false" />
-
-        <!-- ★★★ KRN 演示：真实 React Native 页面 ★★★ -->
-        <activity
-            android:name=".KRNActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".RNContainerActivity"
+            android:name="com.example.krn.RNContainerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -174,22 +169,15 @@
             </intent-filter>
         </activity>
 
-        <!--
-        ★★★ ContentProvider 注册 ★★★
-        authorities：全局唯一标识，相当于域名，调用方通过它找到这个 Provider
-        exported：false = 仅 App 内部使用，true = 对外开放（需要配合 permission）
-        -->
-        <provider
-            android:name=".NoteContentProvider"
-            android:authorities="com.example.demo01.notes"
-            android:exported="false" />
+        <!-- ══════════════════════════════════════════════════
+             app 模块自身的组件（包名 com.example.demo01）
+        ══════════════════════════════════════════════════ -->
 
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
