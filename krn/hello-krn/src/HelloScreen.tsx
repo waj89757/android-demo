@@ -14,7 +14,7 @@
  *   View/Text/TouchableOpacity → 和 KRN 完全相同（都是标准 RN 组件）
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import yoda from './yoda';
+import logger from './logger';
 
 // ─── 类型定义 ──────────────────────────────────────────────────────────────
 
@@ -42,31 +43,61 @@ const HelloScreen: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [log, setLog] = useState<string[]>([]);
+  // ★ 埋点：数据加载完成标志（对照 KRN 里的 hasLoadedData）
+  const [hasLoadedData, setHasLoadedData] = useState<boolean>(false);
+
+  // ★ 埋点：构建页面通用参数（对照 getPageLogParams）
+  //   useCallback 保证引用稳定，不会每次渲染都重新创建，
+  //   这样 useEffect 的 deps 数组比较时不会无限触发
+  // ★ 埋点公参（对照 KRN 里的 getPageLogParams）
+  //   useCallback 保证引用稳定，避免 useEffect 无限触发
+  const getPageLogParams = useCallback(() => ({
+    page: 'HELLO_SCREEN',
+    nickname,
+    hasFollowed: hasFollowed ? 1 : 0,
+  }), [nickname, hasFollowed]);
 
   // 日志工具：显示在页面上，方便 Android 调试
   const appendLog = useCallback((msg: string) => {
     setLog(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 9)]);
   }, []);
 
-  // ★ useEffect：对照 BriefProfile 的 fetchBriefProfileData
-  //   页面挂载时模拟"加载用户数据"
+  // ★ useEffect：页面挂载时模拟"加载用户数据"（对照 fetchBriefProfileData）
   useEffect(() => {
     setLoading(true);
-    // 模拟 500ms 网络请求（真实 KRN 里是 request.get('/rest/...')）
     setTimeout(() => {
       setLoading(false);
+      setHasLoadedData(true);   // ★ 数据加载完成 → 触发曝光埋点
       appendLog('页面数据加载完成');
     }, 500);
   }, [appendLog]);
 
+  // ★ 页面曝光埋点（对照真实 KRN 代码）
+  //   hasLoadedData 变为 true 时触发（确保数据已加载再上报，和你给的代码一致）
+  useEffect(() => {
+    if (!hasLoadedData) return;
+
+    const params = getPageLogParams();
+    logger.sendShow({
+      action: 'HELLO_SCREEN_SHOW',
+      params,
+    });
+    appendLog('📊 曝光埋点已上报 → HELLO_SCREEN_SHOW');
+  }, [hasLoadedData, getPageLogParams, appendLog]);
+
   // ─── 事件处理 ──────────────────────────────────────────────────────────
 
-  // ★ Follow 按钮：纯 React state 切换，无 Bridge 调用
+  // ★ Follow 按钮：切换状态 + 发点击埋点
   const handleFollowPress = useCallback(() => {
     const next = !hasFollowed;
     setHasFollowed(next);
+    logger.sendClick({
+      action: 'HELLO_SCREEN_FOLLOW_BTN',
+      params: { ...getPageLogParams(), toFollowed: next ? 1 : 0 },
+    });
     appendLog(`Follow 状态切换 → ${next ? 'Following' : 'Unfollowed'}`);
-  }, [hasFollowed, appendLog]);
+    appendLog('📊 点击埋点已上报 → HELLO_SCREEN_FOLLOW_BTN');
+  }, [hasFollowed, appendLog, getPageLogParams]);
 
   // ★ Bridge 演示1：调 Native 弹 Toast
   //   KRN 对应：yoda.invoke('live.showToast', { msg: '...' })
