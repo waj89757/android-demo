@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LiveData 对比 Demo：左边没有LiveData，右边有LiveData -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:background="#F8F9FA">
+
+    <!-- 顶部说明 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LiveData 对比实验\n★ 分别点+1按钮，然后旋转屏幕！"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="预期结果：旋转屏幕后\n左边（普通变量）→ 计数丢失，回到0\n右边（LiveData）→ 计数还在，自动恢复"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <!-- ★ 左右对比区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <!-- ★★★ 左边：没有 LiveData（普通Activity变量）★★★ -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="#FFEBEE"
+            android:layout_marginEnd="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="❌ 没有 LiveData"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数据存在 Activity 的普通变量里"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="旋转屏幕 → Activity销毁 → 变量丢失 → 回到0"
+                android:textSize="12sp"
+                android:textColor="#D32F2F"
+                android:layout_marginTop="5dp"/>
+
+            <!-- 计数器显示 -->
+            <TextView
+                android:id="@+id/tv_no_live_data_count"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:text="0"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"
+                android:gravity="center"
+                android:layout_marginTop="20dp"/>
+
+            <!-- Activity重建次数 -->
+            <TextView
+                android:id="@+id/tv_no_live_data_rebuild"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Activity重建次数：1"
+                android:textSize="14sp"
+                android:textColor="#D32F2F"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <!-- 加1按钮 -->
+            <Button
+                android:id="@+id/btn_no_live_data_plus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+1"
+                android:backgroundTint="#D32F2F"
+                android:layout_marginTop="15dp"/>
+
+            <!-- 重置按钮 -->
+            <Button
+                android:id="@+id/btn_no_live_data_reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="重置为0"/>
+
+        </LinearLayout>
+
+        <!-- ★★★ 右边：有 LiveData（ViewModel + LiveData）★★★ -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:background="#E8F5E9"
+            android:layout_marginStart="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✅ 有 LiveData"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数据存在 ViewModel 的 LiveData 里"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="旋转屏幕 → ViewModel不销毁 → LiveData还在 → 自动恢复"
+                android:textSize="12sp"
+                android:textColor="#2E7D32"
+                android:layout_marginTop="5dp"/>
+
+            <!-- 计数器显示 -->
+            <TextView
+                android:id="@+id/tv_live_data_count"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:text="0"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:gravity="center"
+                android:layout_marginTop="20dp"/>
+
+            <!-- ViewModel创建次数 -->
+            <TextView
+                android:id="@+id/tv_live_data_vm_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ViewModel创建次数：1"
+                android:textSize="14sp"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <!-- 加1按钮 -->
+            <Button
+                android:id="@+id/btn_live_data_plus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+1"
+                android:backgroundTint="#2E7D32"
+                android:layout_marginTop="15dp"/>
+
+            <!-- 重置按钮 -->
+            <Button
+                android:id="@+id/btn_live_data_reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="重置为0"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 返回主页按钮 -->
+    <Button
+        android:id="@+id/btn_back_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#F44336"
+        android:layout_marginTop="15dp"/>
+
+</LinearLayout>

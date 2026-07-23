@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.demo" >
+
+    <uses-sdk android:minSdkVersion="24" />
+
+    <application>
+
+        <!-- feature-demo 中的 Activity 声明由 app module 统一管理 -->
+    </application>
+
+</manifest>

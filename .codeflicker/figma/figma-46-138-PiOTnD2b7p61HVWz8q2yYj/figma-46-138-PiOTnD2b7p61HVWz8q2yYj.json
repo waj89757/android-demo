@@ -1,0 +1,1180 @@
+{
+  "id": "46:138",
+  "nodeType": "view",
+  "name": "Location Page ",
+  "boundingRect": {
+    "x": 1051,
+    "y": -431,
+    "width": 360,
+    "height": 800,
+    "top": -431,
+    "left": 1051,
+    "bottom": 369,
+    "right": 1411
+  },
+  "styles": {
+    "boxSizing": "border-box",
+    "overflow": "hidden",
+    "height": "800px",
+    "width": "360px",
+    "background": "#FFFFFF",
+    "position": "relative",
+    "display": "flex",
+    "flexDirection": "column",
+    "alignItems": "flex-start"
+  },
+  "zIndex": 1,
+  "children": [
+    {
+      "id": "46:155",
+      "nodeType": "view",
+      "name": "Status Bar",
+      "boundingRect": {
+        "x": 1032,
+        "y": -437,
+        "width": 385,
+        "height": 44,
+        "top": -437,
+        "left": 1032,
+        "bottom": -393,
+        "right": 1417
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "overflow": "hidden",
+        "position": "relative",
+        "width": "385px",
+        "height": "44px",
+        "marginTop": "-6px",
+        "alignSelf": "flex-end",
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingLeft": "12px",
+        "paddingRight": "14px",
+        "alignItems": "center"
+      },
+      "zIndex": 2,
+      "children": [
+        {
+          "id": "I46:155;3:708",
+          "nodeType": "image",
+          "name": "Time / Light",
+          "boundingRect": {
+            "x": 1044,
+            "y": -424,
+            "width": 54,
+            "height": 21,
+            "top": -424,
+            "left": 1044,
+            "bottom": -403,
+            "right": 1098
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "overflow": "hidden",
+            "width": "54px",
+            "height": "21px",
+            "borderRadius": "20px"
+          },
+          "zIndex": 4,
+          "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-I46-155-3-708.png"
+        },
+        {
+          "id": "I46:155;3:703",
+          "nodeType": "view",
+          "name": "Status Icons",
+          "boundingRect": {
+            "x": 1334,
+            "y": -421,
+            "width": 69,
+            "height": 14,
+            "top": -421,
+            "left": 1334,
+            "bottom": -407,
+            "right": 1403
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "69px",
+            "height": "14px",
+            "display": "flex",
+            "alignItems": "center",
+            "padding": "0px",
+            "gap": "4px"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "I46:155;3:704",
+              "nodeType": "image",
+              "name": "Network Signal / Light",
+              "boundingRect": {
+                "x": 1334,
+                "y": -421,
+                "width": 20,
+                "height": 14,
+                "top": -421,
+                "left": 1334,
+                "bottom": -407,
+                "right": 1354
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "flexBasis": "20px",
+                "width": "20px",
+                "height": "14px"
+              },
+              "zIndex": 1,
+              "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-I46-155-3-704.png"
+            },
+            {
+              "id": "I46:155;3:705",
+              "nodeType": "image",
+              "name": "WiFi Signal / Light",
+              "boundingRect": {
+                "x": 1358,
+                "y": -421,
+                "width": 16,
+                "height": 14,
+                "top": -421,
+                "left": 1358,
+                "bottom": -407,
+                "right": 1374
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "flexBasis": "16px",
+                "width": "16px",
+                "height": "14px"
+              },
+              "zIndex": 2,
+              "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-I46-155-3-705.png"
+            },
+            {
+              "id": "I46:155;3:706",
+              "nodeType": "image",
+              "name": "Battery / Light",
+              "boundingRect": {
+                "x": 1378,
+                "y": -421,
+                "width": 25,
+                "height": 14,
+                "top": -421,
+                "left": 1378,
+                "bottom": -407,
+                "right": 1403
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "flexBasis": "25px",
+                "width": "25px",
+                "height": "14px"
+              },
+              "zIndex": 3,
+              "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-I46-155-3-706.png"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "linear_134:248_134:245_134:244",
+      "name": "linear_edit-button 1_material-symbols:arrow-back-ios_Profile",
+      "nodeType": "view",
+      "styles": {
+        "position": "relative",
+        "width": "328px",
+        "height": "33px",
+        "marginTop": "8px",
+        "alignSelf": "stretch",
+        "marginLeft": "16px",
+        "display": "flex",
+        "flexDirection": "row",
+        "alignItems": "center"
+      },
+      "zIndex": 10,
+      "boundingRect": {
+        "x": 1067,
+        "y": -385,
+        "width": 328,
+        "height": 33,
+        "left": 1067,
+        "top": -385,
+        "right": 1395,
+        "bottom": -352
+      },
+      "children": [
+        {
+          "id": "134:245",
+          "nodeType": "image",
+          "name": "material-symbols:arrow-back-ios",
+          "boundingRect": {
+            "x": 1067,
+            "y": -384,
+            "width": 30,
+            "height": 30,
+            "top": -384,
+            "left": 1067,
+            "bottom": -354,
+            "right": 1097
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "overflow": "hidden",
+            "width": "30px",
+            "height": "30px",
+            "marginLeft": "0px"
+          },
+          "zIndex": 9,
+          "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-134-245.png"
+        },
+        {
+          "id": "134:244",
+          "nodeType": "text",
+          "name": "Profile",
+          "boundingRect": {
+            "x": 1190,
+            "y": -378,
+            "width": 64,
+            "height": 18,
+            "top": -378,
+            "left": 1190,
+            "bottom": -360,
+            "right": 1254
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "20px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000",
+            "marginLeft": "93px"
+          },
+          "zIndex": 8,
+          "characters": "Profile"
+        },
+        {
+          "id": "134:248",
+          "nodeType": "image",
+          "name": "edit-button 1",
+          "boundingRect": {
+            "x": 1362,
+            "y": -385,
+            "width": 33,
+            "height": 33,
+            "top": -385,
+            "left": 1362,
+            "bottom": -352,
+            "right": 1395
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "width": "33px",
+            "height": "33px",
+            "marginLeft": "108px"
+          },
+          "zIndex": 10,
+          "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-134-248.png"
+        }
+      ]
+    },
+    {
+      "id": "overlap_1303:205_148:302",
+      "name": "overlap_Union_Group 39",
+      "nodeType": "view",
+      "styles": {
+        "position": "relative",
+        "width": "141px",
+        "height": "144px",
+        "marginTop": "7px",
+        "marginLeft": "122px"
+      },
+      "children": [
+        {
+          "id": "1303:205",
+          "nodeType": "image",
+          "name": "Union",
+          "boundingRect": {
+            "x": 1154,
+            "y": -345,
+            "width": 141,
+            "height": 130,
+            "top": -345,
+            "left": 1154,
+            "bottom": -215,
+            "right": 1295
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "absolute",
+            "width": "141px",
+            "height": "130px",
+            "top": "0px",
+            "left": "0px"
+          },
+          "zIndex": 14,
+          "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-1303-205.png"
+        },
+        {
+          "id": "148:302",
+          "nodeType": "view",
+          "name": "Group 39",
+          "boundingRect": {
+            "x": 1244,
+            "y": -242,
+            "width": 42,
+            "height": 41,
+            "top": -242,
+            "left": 1244,
+            "bottom": -201,
+            "right": 1286
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "absolute",
+            "width": "42px",
+            "height": "41px",
+            "background": "url(.codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-148-302.png) center / cover no-repeat",
+            "bottom": "0px",
+            "right": "9px",
+            "display": "flex",
+            "flexDirection": "column",
+            "paddingTop": "7.4994049072265625px",
+            "paddingLeft": "8.999986858840202px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 15,
+          "children": [
+            {
+              "id": "148:304",
+              "nodeType": "image",
+              "name": "change_photo 1",
+              "boundingRect": {
+                "x": 1252.9999868588402,
+                "y": -234.50059509277344,
+                "width": 26.953300209029294,
+                "height": 28.883019720888512,
+                "top": -234.50059509277344,
+                "left": 1252.9999868588402,
+                "bottom": -205.61757537188493,
+                "right": 1279.9532870678695
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "overflow": "hidden",
+                "width": "27px",
+                "height": "25px"
+              },
+              "zIndex": 2,
+              "imageUrl": ".codeflicker/figma/figma-46-138-PiOTnD2b7p61HVWz8q2yYj/figma-148-304.png"
+            }
+          ]
+        }
+      ],
+      "zIndex": 15,
+      "boundingRect": {
+        "x": 1154,
+        "y": -345,
+        "width": 141,
+        "height": 144,
+        "left": 1154,
+        "top": -345,
+        "right": 1295,
+        "bottom": -201
+      }
+    },
+    {
+      "id": "overlap_136:313_136:316",
+      "name": "overlap_Group 22_Group 37",
+      "nodeType": "view",
+      "styles": {
+        "position": "relative",
+        "width": "306.00001525878906px",
+        "height": "30px",
+        "marginTop": "12px",
+        "marginLeft": "36px"
+      },
+      "children": [
+        {
+          "id": "136:313",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1068,
+            "y": -189,
+            "width": 172.17007446289062,
+            "height": 30,
+            "top": -189,
+            "left": 1068,
+            "bottom": -159,
+            "right": 1240.1700744628906
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "absolute",
+            "width": "172px",
+            "height": "30px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "background": "#F3F3F3",
+            "top": "0px",
+            "left": "0px",
+            "display": "flex",
+            "flexDirection": "column",
+            "paddingTop": "7px",
+            "paddingLeft": "31.4178466796875px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 12,
+          "children": [
+            {
+              "id": "136:315",
+              "nodeType": "text",
+              "name": "General",
+              "boundingRect": {
+                "x": 1099.4178466796875,
+                "y": -182,
+                "width": 96.76712036132812,
+                "height": 12.272727012634277,
+                "top": -182,
+                "left": 1099.4178466796875,
+                "bottom": -169.72727298736572,
+                "right": 1196.1849670410156
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "width": "97px",
+                "height": "12px",
+                "verticalAlign": "top",
+                "fontSize": "20px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "700",
+                "color": "#ADADAD"
+              },
+              "zIndex": 2,
+              "characters": "General"
+            }
+          ]
+        },
+        {
+          "id": "136:316",
+          "nodeType": "view",
+          "name": "Group 37",
+          "boundingRect": {
+            "x": 1224.1761474609375,
+            "y": -189,
+            "width": 149.82386779785156,
+            "height": 30,
+            "top": -189,
+            "left": 1224.1761474609375,
+            "bottom": -159,
+            "right": 1374.000015258789
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "absolute",
+            "width": "150px",
+            "height": "30px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "background": "#241C53",
+            "top": "0px",
+            "right": "0px",
+            "display": "flex",
+            "flexDirection": "column",
+            "paddingTop": "7px",
+            "paddingLeft": "32.8238525390625px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 13,
+          "children": [
+            {
+              "id": "136:318",
+              "nodeType": "text",
+              "name": "Location",
+              "boundingRect": {
+                "x": 1257,
+                "y": -182,
+                "width": 92.95641326904297,
+                "height": 12.272727012634277,
+                "top": -182,
+                "left": 1257,
+                "bottom": -169.72727298736572,
+                "right": 1349.956413269043
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "width": "93px",
+                "height": "12px",
+                "verticalAlign": "top",
+                "fontSize": "20px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "700",
+                "color": "#FFFFFF"
+              },
+              "zIndex": 2,
+              "characters": "Location"
+            }
+          ]
+        }
+      ],
+      "zIndex": 13,
+      "boundingRect": {
+        "x": 1068,
+        "y": -189,
+        "width": 306.00001525878906,
+        "height": 30,
+        "left": 1068,
+        "top": -189,
+        "right": 1374.000015258789,
+        "bottom": -159
+      }
+    },
+    {
+      "id": "146:237",
+      "nodeType": "view",
+      "name": "Group 38",
+      "boundingRect": {
+        "x": 1062,
+        "y": -134,
+        "width": 342,
+        "height": 69,
+        "top": -134,
+        "left": 1062,
+        "bottom": -65,
+        "right": 1404
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "342px",
+        "height": "69px",
+        "marginTop": "25px",
+        "marginLeft": "30px",
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "zIndex": 4,
+      "children": [
+        {
+          "id": "146:238",
+          "nodeType": "text",
+          "name": "Street",
+          "boundingRect": {
+            "x": 1062,
+            "y": -134,
+            "width": 49,
+            "height": 14,
+            "top": -134,
+            "left": 1062,
+            "bottom": -120,
+            "right": 1111
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "16px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000"
+          },
+          "zIndex": 1,
+          "characters": "Street"
+        },
+        {
+          "id": "146:239",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1062,
+            "y": -109,
+            "width": 342,
+            "height": 44,
+            "top": -109,
+            "left": 1062,
+            "bottom": -65,
+            "right": 1404
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "342px",
+            "height": "44px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "paddingLeft": "15px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "146:241",
+              "nodeType": "text",
+              "name": "XXXXXXXXXXXXXXXXX",
+              "boundingRect": {
+                "x": 1077,
+                "y": -93,
+                "width": 159,
+                "height": 12,
+                "top": -93,
+                "left": 1077,
+                "bottom": -81,
+                "right": 1236
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "verticalAlign": "top",
+                "fontSize": "14px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "500",
+                "color": "#544C4C"
+              },
+              "zIndex": 2,
+              "characters": "XXXXXXXXXXXXXXXXX"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "46:161",
+      "nodeType": "view",
+      "name": "Group 30",
+      "boundingRect": {
+        "x": 1062,
+        "y": -47,
+        "width": 342,
+        "height": 69,
+        "top": -47,
+        "left": 1062,
+        "bottom": 22,
+        "right": 1404
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "342px",
+        "height": "69px",
+        "marginTop": "18px",
+        "marginLeft": "30px",
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "zIndex": 3,
+      "children": [
+        {
+          "id": "46:162",
+          "nodeType": "text",
+          "name": "City",
+          "boundingRect": {
+            "x": 1062,
+            "y": -47,
+            "width": 32,
+            "height": 14,
+            "top": -47,
+            "left": 1062,
+            "bottom": -33,
+            "right": 1094
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "16px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000"
+          },
+          "zIndex": 1,
+          "characters": "City"
+        },
+        {
+          "id": "46:163",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1062,
+            "y": -22,
+            "width": 342,
+            "height": 44,
+            "top": -22,
+            "left": 1062,
+            "bottom": 22,
+            "right": 1404
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "342px",
+            "height": "44px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "paddingLeft": "15px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "46:165",
+              "nodeType": "text",
+              "name": "XXXXXXXXXXXXXXXXX",
+              "boundingRect": {
+                "x": 1077,
+                "y": -6,
+                "width": 159,
+                "height": 12,
+                "top": -6,
+                "left": 1077,
+                "bottom": 6,
+                "right": 1236
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "verticalAlign": "top",
+                "fontSize": "14px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "500",
+                "color": "#544C4C"
+              },
+              "zIndex": 2,
+              "characters": "XXXXXXXXXXXXXXXXX"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "109:236",
+      "nodeType": "view",
+      "name": "Group 36",
+      "boundingRect": {
+        "x": 1062,
+        "y": 40,
+        "width": 342,
+        "height": 69,
+        "top": 40,
+        "left": 1062,
+        "bottom": 109,
+        "right": 1404
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "342px",
+        "height": "69px",
+        "marginTop": "18px",
+        "marginLeft": "30px",
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "zIndex": 7,
+      "children": [
+        {
+          "id": "109:237",
+          "nodeType": "text",
+          "name": "State",
+          "boundingRect": {
+            "x": 1062,
+            "y": 40,
+            "width": 42,
+            "height": 14,
+            "top": 40,
+            "left": 1062,
+            "bottom": 54,
+            "right": 1104
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "16px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000"
+          },
+          "zIndex": 1,
+          "characters": "State"
+        },
+        {
+          "id": "109:238",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1062,
+            "y": 65,
+            "width": 342,
+            "height": 44,
+            "top": 65,
+            "left": 1062,
+            "bottom": 109,
+            "right": 1404
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "342px",
+            "height": "44px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "paddingLeft": "15px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "109:240",
+              "nodeType": "text",
+              "name": "XXXXXX",
+              "boundingRect": {
+                "x": 1077,
+                "y": 81,
+                "width": 56,
+                "height": 12,
+                "top": 81,
+                "left": 1077,
+                "bottom": 93,
+                "right": 1133
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "verticalAlign": "top",
+                "fontSize": "14px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "500",
+                "color": "#544C4C"
+              },
+              "zIndex": 2,
+              "characters": "XXXXXX"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "46:171",
+      "nodeType": "view",
+      "name": "Group 33",
+      "boundingRect": {
+        "x": 1062,
+        "y": 133,
+        "width": 342,
+        "height": 69,
+        "top": 133,
+        "left": 1062,
+        "bottom": 202,
+        "right": 1404
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "342px",
+        "height": "69px",
+        "marginTop": "24px",
+        "marginLeft": "30px",
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "zIndex": 6,
+      "children": [
+        {
+          "id": "46:172",
+          "nodeType": "text",
+          "name": "Country",
+          "boundingRect": {
+            "x": 1062,
+            "y": 133,
+            "width": 65,
+            "height": 14,
+            "top": 133,
+            "left": 1062,
+            "bottom": 147,
+            "right": 1127
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "16px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000"
+          },
+          "zIndex": 1,
+          "characters": "Country"
+        },
+        {
+          "id": "46:173",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1062,
+            "y": 158,
+            "width": 342,
+            "height": 44,
+            "top": 158,
+            "left": 1062,
+            "bottom": 202,
+            "right": 1404
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "342px",
+            "height": "44px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "background": "#F3F3F3",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "paddingLeft": "15px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "46:175",
+              "nodeType": "text",
+              "name": "XXXXXX",
+              "boundingRect": {
+                "x": 1077,
+                "y": 174,
+                "width": 56,
+                "height": 12,
+                "top": 174,
+                "left": 1077,
+                "bottom": 186,
+                "right": 1133
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "verticalAlign": "top",
+                "fontSize": "14px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "500",
+                "color": "#9F9999"
+              },
+              "zIndex": 2,
+              "characters": "XXXXXX"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "46:166",
+      "nodeType": "view",
+      "name": "Group 34",
+      "boundingRect": {
+        "x": 1062,
+        "y": 214,
+        "width": 342,
+        "height": 69,
+        "top": 214,
+        "left": 1062,
+        "bottom": 283,
+        "right": 1404
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "342px",
+        "height": "69px",
+        "marginTop": "12px",
+        "marginLeft": "30px",
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "zIndex": 5,
+      "children": [
+        {
+          "id": "46:167",
+          "nodeType": "text",
+          "name": "Pin Code",
+          "boundingRect": {
+            "x": 1062,
+            "y": 214,
+            "width": 70,
+            "height": 14,
+            "top": 214,
+            "left": 1062,
+            "bottom": 228,
+            "right": 1132
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "16px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "700",
+            "color": "#000000"
+          },
+          "zIndex": 1,
+          "characters": "Pin Code"
+        },
+        {
+          "id": "46:168",
+          "nodeType": "view",
+          "name": "Group 22",
+          "boundingRect": {
+            "x": 1062,
+            "y": 239,
+            "width": 342,
+            "height": 44,
+            "top": 239,
+            "left": 1062,
+            "bottom": 283,
+            "right": 1404
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "position": "relative",
+            "width": "342px",
+            "height": "44px",
+            "borderWidth": "1px",
+            "borderStyle": "solid",
+            "borderColor": "#544C4C24",
+            "borderRadius": "6px",
+            "background": "#F3F3F3",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "paddingLeft": "15px",
+            "alignItems": "flex-start"
+          },
+          "zIndex": 2,
+          "children": [
+            {
+              "id": "46:170",
+              "nodeType": "text",
+              "name": "XXX XXX",
+              "boundingRect": {
+                "x": 1077,
+                "y": 255,
+                "width": 60,
+                "height": 12,
+                "top": 255,
+                "left": 1077,
+                "bottom": 267,
+                "right": 1137
+              },
+              "styles": {
+                "boxSizing": "border-box",
+                "verticalAlign": "top",
+                "fontSize": "14px",
+                "lineHeight": "87.52%",
+                "fontFamily": "Inter",
+                "fontWeight": "500",
+                "color": "#9F9999"
+              },
+              "zIndex": 2,
+              "characters": "XXX XXX"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "134:260",
+      "nodeType": "view",
+      "name": "Group 29",
+      "boundingRect": {
+        "x": 1118,
+        "y": 307,
+        "width": 221,
+        "height": 45,
+        "top": 307,
+        "left": 1118,
+        "bottom": 352,
+        "right": 1339
+      },
+      "styles": {
+        "boxSizing": "border-box",
+        "position": "relative",
+        "width": "221px",
+        "height": "45px",
+        "borderRadius": "6px",
+        "background": "#231542",
+        "marginTop": "24px",
+        "marginLeft": "86px",
+        "display": "flex",
+        "flexDirection": "column",
+        "paddingTop": "14px",
+        "alignItems": "center"
+      },
+      "zIndex": 11,
+      "children": [
+        {
+          "id": "134:262",
+          "nodeType": "text",
+          "name": "Save changes",
+          "boundingRect": {
+            "x": 1162,
+            "y": 321,
+            "width": 134,
+            "height": 18,
+            "top": 321,
+            "left": 1162,
+            "bottom": 339,
+            "right": 1296
+          },
+          "styles": {
+            "boxSizing": "border-box",
+            "verticalAlign": "top",
+            "fontSize": "20px",
+            "lineHeight": "87.52%",
+            "fontFamily": "Inter",
+            "fontWeight": "500",
+            "color": "#FFFFFF"
+          },
+          "zIndex": 2,
+          "characters": "Save changes"
+        }
+      ]
+    }
+  ],
+  "originUrl": "https://www.figma.com/design/PiOTnD2b7p61HVWz8q2yYj/Android-Application-for-Profile-Page--Dashboard-Page-and-Form-page--Community-?node-id=46%3A138&t=Bi0KyXOvlwp0hODl-0"
+}

@@ -164,6 +164,93 @@ const HelloScreen: React.FC = () => {
         </View>
       )}
 
+      {/* ★★★ Native Banner 控制区 ★★★ */}
+      <View style={styles.divider} />
+      <Text style={styles.sectionTitle}>🎯 控制 Native Banner（跨 Activity）</Text>
+      <Text style={styles.sectionDesc}>
+        以下操作会实时改变 MainActivity 顶部的蓝色 Banner{'\n'}
+        原理：JS → Bridge → NativeBannerModule → ActivityHolder → View
+      </Text>
+
+      {/* 高度控制 */}
+      <View style={styles.bannerRow}>
+        <TouchableOpacity
+          style={[styles.bannerBtn, { backgroundColor: '#1565C0' }]}
+          onPress={async () => {
+            appendLog('设置 Banner 高度 → 160dp...');
+            try {
+              await yoda.invoke('NativeBanner.setHeight', { height: 160 });
+              appendLog('✅ Banner 高度 → 160dp');
+            } catch (e) { appendLog(`❌ ${String(e)}`); }
+          }}>
+          <Text style={styles.bannerBtnText}>📏 放大 Banner</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.bannerBtn, { backgroundColor: '#37474F' }]}
+          onPress={async () => {
+            appendLog('设置 Banner 高度 → 40dp...');
+            try {
+              await yoda.invoke('NativeBanner.setHeight', { height: 40 });
+              appendLog('✅ Banner 高度 → 40dp');
+            } catch (e) { appendLog(`❌ ${String(e)}`); }
+          }}>
+          <Text style={styles.bannerBtnText}>📏 缩小 Banner</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 颜色控制 */}
+      <View style={styles.bannerRow}>
+        {[
+          { color: '#E53935', label: '🔴 红' },
+          { color: '#2E7D32', label: '🟢 绿' },
+          { color: '#F57F17', label: '🟡 黄' },
+          { color: '#6A1B9A', label: '🟣 紫' },
+        ].map(({ color, label }) => (
+          <TouchableOpacity
+            key={color}
+            style={[styles.colorBtn, { backgroundColor: color }]}
+            onPress={async () => {
+              appendLog(`设置 Banner 颜色 → ${color}...`);
+              try {
+                await yoda.invoke('NativeBanner.setColor', { color });
+                appendLog(`✅ Banner 颜色 → ${color}`);
+              } catch (e) { appendLog(`❌ ${String(e)}`); }
+            }}>
+            <Text style={styles.bannerBtnText}>{label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* 标题控制 */}
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#00695C' }]}
+        onPress={async () => {
+          appendLog('修改 Banner 标题...');
+          try {
+            await yoda.invoke('NativeBanner.setTitle', {
+              title: '🚀 由 RN 控制',
+              subtitle: `hasFollowed=${hasFollowed}`,
+            });
+            appendLog('✅ Banner 标题已修改');
+          } catch (e) { appendLog(`❌ ${String(e)}`); }
+        }}>
+        <Text style={styles.buttonText}>✏️ 修改 Banner 标题</Text>
+      </TouchableOpacity>
+
+      {/* 重置 */}
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#78909C' }]}
+        onPress={async () => {
+          appendLog('重置 Banner...');
+          try {
+            await yoda.invoke('NativeBanner.reset', {});
+            appendLog('✅ Banner 已重置');
+          } catch (e) { appendLog(`❌ ${String(e)}`); }
+        }}>
+        <Text style={styles.buttonText}>↩️ 重置 Banner</Text>
+      </TouchableOpacity>
+
       {/* 日志区：显示 invoke 调用链路 */}
       <View style={styles.divider} />
       <Text style={styles.sectionTitle}>调用日志</Text>
@@ -299,6 +386,30 @@ const styles = StyleSheet.create({
   },
   bottomPadding: {
     height: 40,
+  },
+  // ★ Native Banner 控制区样式
+  bannerRow: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 8,
+    gap: 8,
+  },
+  bannerBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  colorBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  bannerBtnText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
 

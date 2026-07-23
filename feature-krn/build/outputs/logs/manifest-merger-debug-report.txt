@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml:2:1-6:12
+INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml:2:1-6:12
+	package
+		INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml
+application
+ADDED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml:3:5-5:19
+uses-sdk
+INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml
+INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/waj/AndroidStudioProjects/demo01/feature-krn/src/main/AndroidManifest.xml

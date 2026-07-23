@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- 标题栏 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RN 热更新 Demo（Bundle 加载 + 更新 + 回滚）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#1B5E20"
+        android:gravity="center"
+        android:padding="12dp"/>
+
+    <!-- 当前 Bundle 来源 -->
+    <TextView
+        android:id="@+id/tv_bundle_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="当前 Bundle：检测中..."
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:background="#2E7D32"
+        android:padding="8dp"
+        android:gravity="center"/>
+
+    <!-- Bundle 渲染区（模拟 RN JS 引擎渲染结果）-->
+    <WebView
+        android:id="@+id/wv_bundle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="#FFFFFF"/>
+
+    <!-- 操作按钮区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="6dp">
+
+        <Button
+            android:id="@+id/btn_check_update"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1.检查\n更新"
+            android:backgroundTint="#0D47A1"
+            android:textSize="11sp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btn_download"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2.下载\n安装"
+            android:backgroundTint="#1B5E20"
+            android:textSize="11sp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btn_reload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="3.重载\nBundle"
+            android:backgroundTint="#E65100"
+            android:textSize="11sp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btn_rollback"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="4.回滚\nv1"
+            android:backgroundTint="#B71C1C"
+            android:textSize="11sp"/>
+
+    </LinearLayout>
+
+    <!-- 日志区 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#263238">
+
+        <TextView
+            android:id="@+id/tv_hot_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="10sp"
+            android:textColor="#B2EBF2"
+            android:padding="8dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_back_hot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="8dp"/>
+
+</LinearLayout>

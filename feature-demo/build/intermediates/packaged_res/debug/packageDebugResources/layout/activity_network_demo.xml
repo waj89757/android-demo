@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 网络请求演示页布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:background="#F8F9FA">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="网络请求演示\n（Retrofit + Coroutines）"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"/>
+
+    <!-- ★ 状态提示 -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="点击按钮发起网络请求..."
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 发起请求按钮 -->
+    <Button
+        android:id="@+id/btn_fetch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="发起网络请求（GET 帖子列表）"
+        android:backgroundTint="#1565C0"
+        android:layout_marginTop="10dp"/>
+
+    <!-- ★ 请求结果展示区 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="15dp"
+        android:background="#FFFFFF"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="等待请求结果..."
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:lineSpacingExtra="4dp"/>
+
+    </ScrollView>
+
+    <!-- 返回主页按钮 -->
+    <Button
+        android:id="@+id/btn_back_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#F44336"
+        android:layout_marginTop="15dp"/>
+
+</LinearLayout>

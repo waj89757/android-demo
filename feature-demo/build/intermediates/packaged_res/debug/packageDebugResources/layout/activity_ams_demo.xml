@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AMS 信息展示"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"
+        android:padding="15dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ActivityManagerService 管理着所有进程和 Activity 的生命周期\n以下数据来自 AMS 的公开 API"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:paddingHorizontal="15dp"/>
+
+    <!-- 刷新按钮 -->
+    <Button
+        android:id="@+id/btn_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="刷新 AMS 数据"
+        android:backgroundTint="#1565C0"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 滚动内容区 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <!-- 当前 App 内存信息 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="★ 当前 App 内存信息（AMS 分配给本进程）"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"/>
+
+            <TextView
+                android:id="@+id/tv_memory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加载中..."
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:background="#FFFFFF"
+                android:padding="12dp"
+                android:layout_marginTop="5dp"
+                android:fontFamily="monospace"/>
+
+            <!-- 设备内存总体情况 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="★ 设备整体内存情况（AMS 视角）"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                android:id="@+id/tv_device_memory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加载中..."
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:background="#FFFFFF"
+                android:padding="12dp"
+                android:layout_marginTop="5dp"
+                android:fontFamily="monospace"/>
+
+            <!-- 当前运行的 App 进程 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="★ 当前运行中的 App 进程（AMS 管理的进程表）"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                android:id="@+id/tv_processes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加载中..."
+                android:textSize="12sp"
+                android:textColor="#333333"
+                android:background="#FFFFFF"
+                android:padding="12dp"
+                android:layout_marginTop="5dp"
+                android:fontFamily="monospace"/>
+
+            <!-- Activity 返回栈 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="★ 本 App 的 Task 返回栈（AMS 维护）"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                android:id="@+id/tv_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="加载中..."
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:background="#FFFFFF"
+                android:padding="12dp"
+                android:layout_marginTop="5dp"
+                android:fontFamily="monospace"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#F44336"
+        android:layout_margin="15dp"/>
+
+</LinearLayout>

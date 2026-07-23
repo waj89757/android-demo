@@ -58,42 +58,21 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.constraintlayout)
-
-    // 列表控件
-    implementation(libs.androidx.recyclerview)
-    // ★ ViewPager2 + Fragment 滑动切换页面
-    implementation(libs.androidx.viewpager2)
-
-    // ★ 网络请求：Retrofit + OkHttp + Gson
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
-    implementation(libs.okhttp.logging)
-
-    // ★ Kotlin 协程（异步编程，网络请求必须在子线程）
     implementation(libs.kotlinx.coroutines.android)
-
-    // ★ Lifecycle KTX（提供 lifecycleScope，在 Activity 里启动协程）
     implementation(libs.lifecycle.runtime.ktx)
-
-    // ★ ViewModel + LiveData（数据管理与生命周期感知）
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.androidx.recyclerview)
 
-    // ★ LocalBroadcastManager（App 内部广播，不经过 AMS）
-    implementation(libs.localbroadcastmanager)
-
-    // ★★★ React Native 0.73 集成 ★★★
-    // react-android：RN 核心运行时（ReactRootView / ReactActivity / NativeModules）
-    implementation("com.facebook.react:react-android:0.73.6")
-    // hermes-android：Hermes JS 引擎（0.73 默认用 Hermes，比 JSC 更快更省内存）
-    implementation("com.facebook.react:hermes-android:0.73.6")
+    // ★ 依赖四个子模块（各自的依赖由各 module 自己管理）
+    implementation(project(":core"))
+    implementation(project(":network"))
+    implementation(project(":feature-demo"))
+    implementation(project(":feature-krn"))
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

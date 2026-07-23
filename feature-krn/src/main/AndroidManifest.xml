@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest>
+    <application>
+        <!-- feature-krn 中的 Activity 声明由 app module 统一管理 -->
+    </application>
+</manifest>

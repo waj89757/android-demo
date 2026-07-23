@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ProfileFragment 的布局：展示用户信息 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#FFF3E0">
+
+    <!-- Fragment 标题 -->
+    <TextView
+        android:id="@+id/tv_profile_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="个人主页 Fragment"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#E65100"/>
+
+    <!-- 用户信息卡片 -->
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="用户名：加载中..."
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/tv_user_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="用户ID：加载中..."
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tv_user_level"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="等级：加载中..."
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 发送消息给 Activity 的按钮 -->
+    <Button
+        android:id="@+id/btn_send_to_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fragment 向 Activity 发送消息"
+        android:layout_marginTop="30dp"/>
+
+</LinearLayout>

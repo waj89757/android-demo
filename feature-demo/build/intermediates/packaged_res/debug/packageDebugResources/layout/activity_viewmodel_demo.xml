@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ViewModel + LiveData 演示页布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:background="#F8F9FA">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ViewModel + LiveData 演示\n（★ 旋转屏幕试试，数据还在！）"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"/>
+
+    <!-- ★ ViewModel 数据来源提示 -->
+    <TextView
+        android:id="@+id/tv_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="数据来源：ViewModel（旋转屏幕不丢失）"
+        android:textSize="16sp"
+        android:textColor="#4CAF50"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 状态提示 -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="点击按钮发起网络请求..."
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 发起请求按钮 -->
+    <Button
+        android:id="@+id/btn_fetch_vm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="通过 ViewModel 发起网络请求"
+        android:backgroundTint="#4CAF50"
+        android:layout_marginTop="10dp"/>
+
+    <!-- ★ ViewModel 创建次数计数器 -->
+    <!-- 旋转屏幕时 ViewModel 不会被重建（计数器不递增） -->
+    <!-- 但 Activity 会重建（可以看到 Activity 的创建次数递增） -->
+    <TextView
+        android:id="@+id/tv_vm_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ViewModel 创建次数：1（旋转屏幕不会递增）"
+        android:textSize="14sp"
+        android:textColor="#E91E63"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"/>
+
+    <!-- 请求结果展示区 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="等待请求结果...\n\n★ 旋转屏幕试试！\n没有 ViewModel → 数据丢失，需要重新请求\n有 ViewModel → 数据还在，瞬间恢复"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:lineSpacingExtra="4dp"/>
+
+    </ScrollView>
+
+    <!-- 返回主页按钮 -->
+    <Button
+        android:id="@+id/btn_back_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#F44336"
+        android:layout_marginTop="15dp"/>
+
+</LinearLayout>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ContentProvider Demo"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:gravity="center"
+        android:padding="14dp"
+        android:background="#FFFFFF"/>
+
+    <!-- 场景一：自定义 Provider（笔记数据） -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一、自定义 ContentProvider（笔记数据库）"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#1565C0"
+        android:padding="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <EditText
+            android:id="@+id/et_note_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="标题"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:layout_marginEnd="6dp"/>
+
+        <EditText
+            android:id="@+id/et_note_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="内容"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:layout_marginEnd="6dp"/>
+
+        <Button
+            android:id="@+id/btn_insert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="插入"
+            android:backgroundTint="#1B5E20"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="6dp">
+
+        <Button
+            android:id="@+id/btn_query_all"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="查询全部"
+            android:backgroundTint="#0D47A1"
+            android:layout_marginEnd="6dp"
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/btn_delete_last"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="删除最后一条"
+            android:backgroundTint="#B71C1C"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <!-- Provider 结果展示 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="6dp"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:id="@+id/tv_notes_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击「查询全部」查看数据..."
+            android:textSize="11sp"
+            android:padding="8dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <!-- 场景二：读系统联系人 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="二、读系统 ContentProvider（手机联系人）"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#4A148C"
+        android:padding="10dp"/>
+
+    <Button
+        android:id="@+id/btn_read_contacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="读取手机联系人（需授权）"
+        android:backgroundTint="#4A148C"
+        android:layout_marginHorizontal="10dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="6dp"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:id="@+id/tv_contacts_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击上方按钮读取..."
+            android:textSize="11sp"
+            android:padding="8dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DiffUtil 演示 item：商品卡（名字 + 价格 + 库存）
+  ┌──────────────────────────────────────────┐
+  │  iPhone              ￥5999      库存 10   │
+  └──────────────────────────────────────────┘
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="#F5F5F5">
+
+    <!-- 商品名：占满剩余空间 -->
+    <TextView
+        android:id="@+id/tv_product_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#222222" />
+
+    <!-- 价格：红色 -->
+    <TextView
+        android:id="@+id/tv_product_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:textSize="15sp"
+        android:textColor="#E53935" />
+
+    <!-- 库存：灰色 -->
+    <TextView
+        android:id="@+id/tv_product_stock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="#888888" />
+
+</LinearLayout>

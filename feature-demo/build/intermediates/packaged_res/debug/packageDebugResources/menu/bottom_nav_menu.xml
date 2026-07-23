@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  底部导航菜单
+  每个 item 对应一个 Tab：
+    id        → 代码里用来判断点了哪个 Tab
+    title     → 图标下面的文字
+    icon      → 图标（这里用系统内置图标，无需自定义）
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:title="Home"
+        android:icon="@android:drawable/ic_menu_compass" />
+
+    <item
+        android:id="@+id/nav_rooms"
+        android:title="Rooms"
+        android:icon="@android:drawable/ic_menu_agenda" />
+
+    <item
+        android:id="@+id/nav_inbox"
+        android:title="Inbox"
+        android:icon="@android:drawable/ic_dialog_email" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:title="Profile"
+        android:icon="@android:drawable/ic_menu_myplaces" />
+
+</menu>

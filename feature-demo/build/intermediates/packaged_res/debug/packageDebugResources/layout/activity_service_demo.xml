@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Service Demo（模拟推送服务）"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="5dp"/>
+
+    <!-- Service 状态显示 -->
+    <TextView
+        android:id="@+id/tv_service_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Service 状态：未启动"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:background="#D32F2F"
+        android:gravity="center"
+        android:padding="10dp"/>
+
+    <!-- 控制按钮区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btn_start_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="启动 Service"
+            android:backgroundTint="#1B5E20"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/btn_stop_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="停止 Service"
+            android:backgroundTint="#B71C1C"
+            android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <Button
+            android:id="@+id/btn_bind_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="绑定 Service"
+            android:backgroundTint="#0D47A1"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/btn_unbind_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="解绑 Service"
+            android:backgroundTint="#1A237E"
+            android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+    <!-- 通过 Binder 直接调用 Service 方法（需要先绑定）-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp">
+
+        <Button
+            android:id="@+id/btn_send_immediate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="立即发送消息\n(需绑定)"
+            android:backgroundTint="#E65100"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/btn_clear_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="清空消息计数\n(需绑定)"
+            android:backgroundTint="#880E4F"
+            android:layout_margin="5dp"/>
+
+    </LinearLayout>
+
+    <!-- Binding 状态说明 -->
+    <TextView
+        android:id="@+id/tv_bind_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Binding 状态：未绑定（无法直接调用 Service 方法）"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:background="#FFF9C4"
+        android:padding="8dp"
+        android:layout_marginHorizontal="10dp"/>
+
+    <!-- 消息计数 -->
+    <TextView
+        android:id="@+id/tv_message_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="累计收到消息：0 条"
+        android:textSize="14sp"
+        android:textColor="#333333"
+        android:textStyle="bold"
+        android:background="#E8F5E9"
+        android:padding="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="center"/>
+
+    <!-- 消息列表标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="收到的消息（最新5条）："
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#1565C0"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="10dp"/>
+
+    <!-- 消息内容（最新5条） -->
+    <TextView
+        android:id="@+id/tv_messages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="（Service 启动后，每5秒会收到一条模拟消息）\n\n说明：\n- 即使你按 Home 键退出界面，Service 继续运行\n- 通知栏会持续更新（Foreground Service 效果）\n- 回来后消息列表会补充更新"
+        android:textSize="13sp"
+        android:textColor="#444444"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:layout_margin="10dp"
+        android:fontFamily="monospace"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回主页"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="10dp"/>
+
+</LinearLayout>

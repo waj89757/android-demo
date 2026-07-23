@@ -2,13 +2,45 @@ package com.example.demo01
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.core.BannerHost
+import com.example.demo.AmsDemoActivity
+import com.example.demo.BroadcastDemoActivity
+import com.example.demo.ContentProviderDemoActivity
+import com.example.demo.DeepLinkDemoActivity
+import com.example.demo.DiffUtilDemoActivity
+import com.example.demo.FragmentDemoActivity
+import com.example.demo.HandlerDemoActivity
+import com.example.demo.LiveDataCompareActivity
+import com.example.demo.MvpDemoActivity
+import com.example.demo.MyTextAdapter
+import com.example.demo.NetworkDemoActivity
+import com.example.demo.ProfileActivity
+import com.example.demo.SecondActivity
+import com.example.demo.ServiceDemoActivity
+import com.example.demo.SurfaceDemoActivity
+import com.example.demo.ViewModelDemoActivity
+import com.example.demo.ViewPagerDemoActivity
+import com.example.demo.WanasActivity
+import com.example.demo.WebViewDemoActivity
+import com.example.krn.ActivityHolder
+import com.example.krn.HotUpdateDemoActivity
+import com.example.krn.KRNActivity
+import com.example.krn.OfflineDemoActivity
+import com.example.krn.RNContainerActivity
 
-class MainActivity : AppCompatActivity() {
+/**
+ * MainActivity：App 入口，连接所有功能模块
+ *
+ * 实现 BannerHost 接口，让 feature-krn 里的 NativeBannerModule
+ * 可以通过接口操作本页面的 View，而不需要直接依赖 MainActivity 类
+ */
+class MainActivity : AppCompatActivity(), BannerHost {
 
     private lateinit var etInput: EditText
     private lateinit var btnShow: Button
@@ -37,10 +69,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rvList: androidx.recyclerview.widget.RecyclerView
     private lateinit var textAdapter: MyTextAdapter
 
-    // 用来演示状态恢复的计数器
     private var clickCount = 0
 
-    // 注册页面跳转结果回调
     private val jumpLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -49,7 +79,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    // 注册 Bundle 跳转结果回调
     private val bundleLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -58,26 +87,42 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    // ─── BannerHost 接口实现 ───────────────────────────────────────────────────
+
+    /** NativeBannerModule 通过接口来 find View，不需要直接持有 MainActivity */
+    override fun findViewByResId(id: Int): View? = findViewById(id)
+
+    /** NativeBannerModule 通过接口切到主线程，不需要直接持有 MainActivity */
+    override fun runOnMainThread(action: () -> Unit) = runOnUiThread(action)
+
+    // ─── 生命周期 ─────────────────────────────────────────────────────────────
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
         initClickEvent()
 
-        // ★ 用法②：从 savedInstanceState 恢复数据
-        // 如果 Activity 因屏幕旋转等被系统重建，savedInstanceState 不为 null
+        // ★ 注册到 ActivityHolder，供 NativeBannerModule 通过 Bridge 控制本页 Banner
+        ActivityHolder.host = this
+
         if (savedInstanceState != null) {
             clickCount = savedInstanceState.getInt("click_count", 0)
             Toast.makeText(this, "恢复了点击次数：$clickCount", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // ★ 用法②：保存状态 —— 屏幕旋转、系统回收内存时调用
+    override fun onDestroy() {
+        super.onDestroy()
+        ActivityHolder.host = null
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt("click_count", clickCount)
-        // 可以存任何基本类型：String, Int, Float, Boolean, Long 等
     }
+
+    // ─── 初始化 ───────────────────────────────────────────────────────────────
 
     private fun initView() {
         etInput = findViewById(R.id.et_input)
@@ -86,7 +131,6 @@ class MainActivity : AppCompatActivity() {
         btnJump = findViewById(R.id.btn_jump)
         btnDialog = findViewById(R.id.btn_dialog)
         btnBundle = findViewById(R.id.btn_bundle)
-
         btnFragment = findViewById(R.id.btn_fragment)
         btnViewPager = findViewById(R.id.btn_viewpager)
         btnNetwork = findViewById(R.id.btn_network)
@@ -103,17 +147,15 @@ class MainActivity : AppCompatActivity() {
         btnWebview = findViewById(R.id.btn_webview)
         btnOfflineDemo = findViewById(R.id.btn_offline_demo)
         btnHotUpdate = findViewById(R.id.btn_hot_update)
-        btnProfile   = findViewById(R.id.btn_profile)
-        btnWanas     = findViewById(R.id.btn_wanas)
+        btnProfile = findViewById(R.id.btn_profile)
+        btnWanas = findViewById(R.id.btn_wanas)
 
         rvList = findViewById(R.id.rv_list)
         val initData = mutableListOf<String>()
         textAdapter = MyTextAdapter(initData)
         rvList.adapter = textAdapter
         rvList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-
-        val testData = listOf("测试数据1", "测试数据2", "测试数据3", "后端接口模拟数据")
-        textAdapter.refreshData(testData)
+        textAdapter.refreshData(listOf("测试数据1", "测试数据2", "测试数据3", "后端接口模拟数据"))
     }
 
     private fun initClickEvent() {
@@ -123,151 +165,52 @@ class MainActivity : AppCompatActivity() {
             if (text.isEmpty()) {
                 Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "输入内容：$text (点击次数：$clickCount)", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "输入内容：$text (点击次数：$clickCount)", Toast.LENGTH_SHORT).show()
             }
         }
 
-        btnClear.setOnClickListener {
-            etInput.setText("")
-        }
+        btnClear.setOnClickListener { etInput.setText("") }
 
-        // 旧的跳转方式：逐个 putExtra（底层还是 Bundle，只是包装了）
         btnJump.setOnClickListener {
-            val text = etInput.text.toString().trim()
             val intent = Intent(this, SecondActivity::class.java)
-            intent.putExtra("send_key", text)
+            intent.putExtra("send_key", etInput.text.toString().trim())
             jumpLauncher.launch(intent)
         }
 
-        // ★ 用法①：显式创建 Bundle，一次性打包多个值
         btnBundle.setOnClickListener {
-            val text = etInput.text.toString().trim()
-            val bundle = Bundle()
-            bundle.putString("send_key", text)          // String 类型
-            bundle.putInt("user_id", 10086)             // Int 类型
-            bundle.putBoolean("is_vip", true)            // Boolean 类型
-            bundle.putDouble("score", 95.5)              // Double 类型
-
-            val intent = Intent(this, SecondActivity::class.java)
-            intent.putExtras(bundle)  // 把整个 Bundle 放进 Intent
-            bundleLauncher.launch(intent)
+            val bundle = Bundle().apply {
+                putString("send_key", etInput.text.toString().trim())
+                putInt("user_id", 10086)
+                putBoolean("is_vip", true)
+                putDouble("score", 95.5)
+            }
+            bundleLauncher.launch(Intent(this, SecondActivity::class.java).apply { putExtras(bundle) })
         }
 
-        // ★ Fragment 演示跳转
-        btnFragment.setOnClickListener {
-            val intent = Intent(this, FragmentDemoActivity::class.java)
-            startActivity(intent)
-        }
+        btnFragment.setOnClickListener { startActivity(Intent(this, FragmentDemoActivity::class.java)) }
+        btnViewPager.setOnClickListener { startActivity(Intent(this, ViewPagerDemoActivity::class.java)) }
+        btnNetwork.setOnClickListener { startActivity(Intent(this, NetworkDemoActivity::class.java)) }
+        btnViewModel.setOnClickListener { startActivity(Intent(this, ViewModelDemoActivity::class.java)) }
+        btnLiveDataCompare.setOnClickListener { startActivity(Intent(this, LiveDataCompareActivity::class.java)) }
+        btnMvp.setOnClickListener { startActivity(Intent(this, MvpDemoActivity::class.java)) }
 
-        // ★ ViewPager2 演示跳转
-        btnViewPager.setOnClickListener {
-            val intent = Intent(this, ViewPagerDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ 网络请求演示跳转
-        btnNetwork.setOnClickListener {
-            val intent = Intent(this, NetworkDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ ViewModel + LiveData 演示跳转
-        btnViewModel.setOnClickListener {
-            val intent = Intent(this, ViewModelDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ LiveData 对比实验跳转
-        btnLiveDataCompare.setOnClickListener {
-            val intent = Intent(this, LiveDataCompareActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ MVP 架构演示跳转
-        btnMvp.setOnClickListener {
-            val intent = Intent(this, MvpDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ DeepLink 演示跳转 —— 用隐式 Intent 模拟外部触发
-        //
-        // 真实场景：用户在微信/浏览器/Push 里点了一个链接
-        //           Android 系统查路由表，找到我们 App 能处理这个 URL
-        //           系统启动 DeepLinkDemoActivity，intent.data = 这个 URI
-        //
-        // 这里模拟：App 内部构造同样的隐式 Intent，效果等价
         btnDeepLink.setOnClickListener {
             val uri = android.net.Uri.parse("demo01://post?id=888&title=DeepLink学习Demo")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            startActivity(intent)
+            startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
 
-        // ★ AMS 信息展示跳转
-        btnAms.setOnClickListener {
-            val intent = Intent(this, AmsDemoActivity::class.java)
-            startActivity(intent)
-        }
+        btnAms.setOnClickListener { startActivity(Intent(this, AmsDemoActivity::class.java)) }
+        btnService.setOnClickListener { startActivity(Intent(this, ServiceDemoActivity::class.java)) }
+        btnHandler.setOnClickListener { startActivity(Intent(this, HandlerDemoActivity::class.java)) }
+        btnSurface.setOnClickListener { startActivity(Intent(this, SurfaceDemoActivity::class.java)) }
+        btnBroadcast.setOnClickListener { startActivity(Intent(this, BroadcastDemoActivity::class.java)) }
+        btnContentProvider.setOnClickListener { startActivity(Intent(this, ContentProviderDemoActivity::class.java)) }
+        btnWebview.setOnClickListener { startActivity(Intent(this, WebViewDemoActivity::class.java)) }
+        btnOfflineDemo.setOnClickListener { startActivity(Intent(this, OfflineDemoActivity::class.java)) }
+        btnHotUpdate.setOnClickListener { startActivity(Intent(this, HotUpdateDemoActivity::class.java)) }
+        btnProfile.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
+        btnWanas.setOnClickListener { startActivity(Intent(this, WanasActivity::class.java)) }
 
-        // ★ Service 演示跳转
-        btnService.setOnClickListener {
-            val intent = Intent(this, ServiceDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ Handler/Looper 演示跳转
-        btnHandler.setOnClickListener {
-            val intent = Intent(this, HandlerDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ SurfaceFlinger 演示跳转
-        btnSurface.setOnClickListener {
-            val intent = Intent(this, SurfaceDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ Broadcast 演示跳转
-        btnBroadcast.setOnClickListener {
-            val intent = Intent(this, BroadcastDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ ContentProvider 演示跳转
-        btnContentProvider.setOnClickListener {
-            val intent = Intent(this, ContentProviderDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ WebView 演示跳转
-        btnWebview.setOnClickListener {
-            val intent = Intent(this, WebViewDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ 离线包演示跳转
-        btnOfflineDemo.setOnClickListener {
-            val intent = Intent(this, OfflineDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ 热更新演示跳转
-        btnHotUpdate.setOnClickListener {
-            val intent = Intent(this, HotUpdateDemoActivity::class.java)
-            startActivity(intent)
-        }
-
-        // ★ 个人资料页（Figma UI 练习）
-        btnProfile.setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java))
-        }
-
-        // ★ Wanas 首页（Fragment + BottomNav + RecyclerView 多类型）
-        btnWanas.setOnClickListener {
-            startActivity(Intent(this, WanasActivity::class.java))
-        }
-
-        // ★ DiffUtil 演示（ListAdapter 增删改动画）
         findViewById<Button>(R.id.btn_diffutil).setOnClickListener {
             startActivity(Intent(this, DiffUtilDemoActivity::class.java))
         }
@@ -277,11 +220,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, KRNActivity::class.java))
         }
 
-        // ★ RN URI 路由：三个页面入口
+        // ★ RN URI 路由
         fun openRN(uri: String) {
-            val intent = Intent(this, RNContainerActivity::class.java)
-            intent.putExtra("uri", uri)
-            startActivity(intent)
+            startActivity(Intent(this, RNContainerActivity::class.java).apply {
+                putExtra("uri", uri)
+            })
         }
         findViewById<Button>(R.id.btn_rn_product).setOnClickListener {
             openRN("myapp://product/detail?id=666&name=%E8%93%9D%E7%89%99%E8%80%B3%E6%9C%BA")

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  WanasActivity 的布局：容器 + 底部导航栏
+  ┌─────────────────────────────────┐
+  │  fragment_container             │  ← Fragment 内容区，占满剩余空间
+  │  （HomeFragment / RoomsFragment  │
+  │   / InboxFragment / ProfileFrag）│
+  ├─────────────────────────────────┤
+  │  BottomNavigationView           │  ← 底部 Tab 栏，固定高度
+  │  [Home] [Rooms] [Inbox] [Profile]│
+  └─────────────────────────────────┘
+
+  ConstraintLayout 负责把两个子 View 钉住：
+  - fragment_container 顶部对齐父容器，底部对齐 BottomNav 的顶部
+  - BottomNavigationView 底部对齐父容器
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A1033">
+
+    <!-- Fragment 内容区：顶部到父容器顶，底部到导航栏顶 -->
+    <FrameLayout
+        android:id="@+id/wanas_fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 底部导航栏：紧贴底部 -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#2D1B5E"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="#FFFFFF"
+        app:itemTextColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

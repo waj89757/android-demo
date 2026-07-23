@@ -1,0 +1,22 @@
+R_DEF: Internal format may change without notice
+local
+id btn_back_hot
+id btn_back_offline
+id btn_check_update
+id btn_download
+id btn_load_offline
+id btn_reinstall
+id btn_reload
+id btn_rn_back
+id btn_rollback
+id tv_bundle_source
+id tv_current_route
+id tv_hot_log
+id tv_offline_log
+id tv_rn_log
+id web_view_offline
+id wv_bundle
+id wv_rn
+layout activity_hot_update_demo
+layout activity_offline_demo
+layout activity_rn_container

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A2E">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SurfaceFlinger Demo"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:padding="12dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="小球在子线程独立渲染（SurfaceView）\n主线程 UI 不阻塞，两者互相独立"
+        android:textSize="12sp"
+        android:textColor="#AAAAAA"
+        android:gravity="center"
+        android:paddingBottom="8dp"/>
+
+    <!--
+    ★ SurfaceView：有自己独立 Surface（图层）的 View
+      和普通 View 的区别：
+        普通 View → 所有控件共享 App 的一个 Surface，主线程绘制
+        SurfaceView → 自己有独立 Surface，可以子线程绘制
+      SurfaceFlinger 把它当独立图层单独合成
+    -->
+    <com.example.demo01.BouncingBallSurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- 这些普通控件在主线程渲染（和 SurfaceView 互不影响） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#16213E"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_fps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FPS: --"
+            android:textColor="#00FF88"
+            android:textSize="14sp"
+            android:fontFamily="monospace"/>
+
+        <TextView
+            android:id="@+id/tv_thread_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="渲染线程: --"
+            android:textColor="#00FF88"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+
+        <TextView
+            android:id="@+id/tv_layer_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="★ SurfaceView 有独立 Surface（图层）\n★ 子线程直接写入，SurfaceFlinger 负责合成\n★ 不受主线程 16ms 限制影响"
+            android:textColor="#FFB800"
+            android:textSize="11sp"
+            android:paddingTop="5dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <!-- 帧率切换按钮 -->
+            <Button
+                android:id="@+id/btn_fps_30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="30fps"
+                android:backgroundTint="#1B5E20"
+                android:layout_marginEnd="3dp"/>
+
+            <Button
+                android:id="@+id/btn_fps_60"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="60fps"
+                android:backgroundTint="#0D47A1"
+                android:layout_marginEnd="3dp"/>
+
+            <Button
+                android:id="@+id/btn_fps_120"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="120fps"
+                android:backgroundTint="#B71C1C"
+                android:layout_marginEnd="3dp"/>
+
+            <Button
+                android:id="@+id/btn_fps_max"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="无限制"
+                android:backgroundTint="#4A148C"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btn_add_ball"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="加一个球"
+                android:backgroundTint="#0F3460"
+                android:layout_marginEnd="5dp"/>
+
+            <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="清空"
+                android:backgroundTint="#533483"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="返回"
+            android:backgroundTint="#546E7A"
+            android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

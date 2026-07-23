@@ -29,3 +29,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "demo01"
 include(":app")
+include(":core")
+include(":network")
+include(":feature-demo")
+include(":feature-krn")

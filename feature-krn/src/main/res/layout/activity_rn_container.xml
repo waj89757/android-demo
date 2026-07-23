@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- 标题栏 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RN 容器 Activity（URI 路由）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#4A148C"
+        android:gravity="center"
+        android:padding="12dp"/>
+
+    <!-- 当前路由信息 -->
+    <TextView
+        android:id="@+id/tv_current_route"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="路由：解析中..."
+        android:textSize="11sp"
+        android:textColor="#FFFFFF"
+        android:background="#6A1B9A"
+        android:padding="8dp"
+        android:fontFamily="monospace"/>
+
+    <!-- RN 页面渲染区（WebView 模拟 JS 引擎） -->
+    <WebView
+        android:id="@+id/wv_rn"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"/>
+
+    <!-- Native 日志区 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#1A237E">
+
+        <TextView
+            android:id="@+id/tv_rn_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="[Native 日志]\n"
+            android:textSize="10sp"
+            android:textColor="#C5CAE9"
+            android:padding="8dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_rn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="8dp"/>
+
+</LinearLayout>

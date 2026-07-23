@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BroadcastReceiver Demo"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"
+        android:padding="15dp"/>
+
+    <!-- 网络状态（系统广播） -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一、系统广播（网络状态变化）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#1565C0"
+        android:paddingHorizontal="15dp"/>
+
+    <TextView
+        android:id="@+id/tv_network_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="网络状态：检测中..."
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="#FFFFFF"
+        android:padding="15dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="请开关手机 WiFi 或 移动数据，观察上方状态变化\n（动态注册广播，Activity 活着才接收）"
+        android:textSize="11sp"
+        android:textColor="#777777"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="4dp"/>
+
+    <!-- App 内广播 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="二、App 内广播（自定义事件）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#1B5E20"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="15dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="5dp">
+
+        <Button
+            android:id="@+id/btn_send_local"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="发送自定义广播"
+            android:backgroundTint="#1B5E20"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btn_send_with_data"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="发送带数据广播"
+            android:backgroundTint="#4A148C"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_local_received"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="（等待接收...）"
+        android:textSize="13sp"
+        android:textColor="#333333"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="monospace"/>
+
+    <!-- 广播日志 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="广播事件日志："
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="12dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp">
+
+        <TextView
+            android:id="@+id/tv_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="等待广播...\n"
+            android:textSize="11sp"
+            android:textColor="#333333"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:fontFamily="monospace"/>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="15dp"/>
+
+</LinearLayout>

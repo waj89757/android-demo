@@ -11,6 +11,36 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <!-- ★★★ Native Banner：由 RN 通过 Bridge 控制高度/颜色/文字 ★★★ -->
+        <LinearLayout
+            android:id="@+id/native_banner"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#1565C0"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tv_banner_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎯 Native Banner"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_banner_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="等待 RN 控制..."
+                android:textColor="#BBDEFB"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
+
         <!-- 页面主标题 -->
         <TextView
             android:id="@+id/tv_title"

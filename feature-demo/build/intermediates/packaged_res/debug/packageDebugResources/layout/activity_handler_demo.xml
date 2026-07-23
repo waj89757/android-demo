@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Handler / Looper Demo"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:gravity="center"
+        android:padding="15dp"/>
+
+    <!-- ===== 场景一：子线程 → 主线程更新 UI ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="场景一：子线程把结果交给主线程更新 UI"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#1565C0"
+        android:paddingHorizontal="15dp"/>
+
+    <TextView
+        android:id="@+id/tv_thread_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="（点击按钮，子线程模拟网络请求2秒后更新这里）"
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="monospace"/>
+
+    <Button
+        android:id="@+id/btn_thread_to_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="子线程 → 主线程（handler.post）"
+        android:backgroundTint="#1565C0"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"/>
+
+    <!-- ===== 场景二：延迟任务（倒计时） ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="场景二：延迟任务（handler.postDelayed）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#1B5E20"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="12dp"/>
+
+    <TextView
+        android:id="@+id/tv_countdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="倒计时：未启动"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#1B5E20"
+        android:gravity="center"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:id="@+id/btn_start_countdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="开始10秒倒计时"
+            android:backgroundTint="#1B5E20"
+            android:layout_marginEnd="5dp"/>
+
+        <Button
+            android:id="@+id/btn_stop_countdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="停止"
+            android:backgroundTint="#B71C1C"/>
+    </LinearLayout>
+
+    <!-- ===== 场景三：HandlerThread（子线程的 Looper） ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="场景三：HandlerThread（子线程的事件循环）"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#4A148C"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="12dp"/>
+
+    <TextView
+        android:id="@+id/tv_handler_thread"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="（点击按钮，向子线程的消息队列投递任务）"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="monospace"/>
+
+    <Button
+        android:id="@+id/btn_post_to_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="向子线程 Looper 投递任务"
+        android:backgroundTint="#4A148C"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"/>
+
+    <!-- ===== 日志区 ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="执行日志（看线程名）："
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:paddingHorizontal="15dp"
+        android:paddingTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tv_log"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="等待操作...\n"
+        android:textSize="11sp"
+        android:textColor="#333333"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="monospace"/>
+
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:backgroundTint="#546E7A"
+        android:layout_margin="15dp"/>
+
+</LinearLayout>
