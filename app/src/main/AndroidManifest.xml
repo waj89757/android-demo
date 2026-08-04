@@ -18,6 +18,23 @@
     <!-- ★ 读取手机联系人（运行时权限，用户需主动授权）-->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- ★ 录音权限（语音转文字功能，运行时需用户授权）-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!--
+    ★★★ Android 11+ （API 30）包可见性声明 ★★★
+
+    不加这个，SpeechRecognizer.isRecognitionAvailable() 在 Android 11+ 上
+    永远返回 false——因为系统默认不允许 App 查询其他 App 提供的服务。
+
+    <queries> 是 <manifest> 的直接子元素，不在 <application> 内。
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"

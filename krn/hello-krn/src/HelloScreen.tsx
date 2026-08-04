@@ -25,6 +25,8 @@ import {
 } from 'react-native';
 import yoda from './yoda';
 import logger from './logger';
+import speechService from './services/speechService';
+import VoiceButton, { VoiceButtonStatus } from './components/VoiceButton';
 
 // ─── 类型定义 ──────────────────────────────────────────────────────────────
 
@@ -45,6 +47,12 @@ const HelloScreen: React.FC = () => {
   const [log, setLog] = useState<string[]>([]);
   // ★ 埋点：数据加载完成标志（对照 KRN 里的 hasLoadedData）
   const [hasLoadedData, setHasLoadedData] = useState<boolean>(false);
+
+  // ★ 语音识别相关 state
+  const [voiceStatus, setVoiceStatus] = useState<VoiceButtonStatus>('idle');
+  const [volume, setVolume] = useState<number>(0);
+  const [partialText, setPartialText] = useState<string>('');  // 实时部分结果
+  const [finalText, setFinalText] = useState<string>('');      // 最终结果
 
   // ★ 埋点：构建页面通用参数（对照 getPageLogParams）
   //   useCallback 保证引用稳定，不会每次渲染都重新创建，
@@ -98,6 +106,108 @@ const HelloScreen: React.FC = () => {
     appendLog(`Follow 状态切换 → ${next ? 'Following' : 'Unfollowed'}`);
     appendLog('📊 点击埋点已上报 → HELLO_SCREEN_FOLLOW_BTN');
   }, [hasFollowed, appendLog, getPageLogParams]);
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  ★★★ 语音转文字 ★★★
+  // ═══════════════════════════════════════════════════════════════════════
+
+  /**
+   * ★ 订阅 Native 推来的语音事件
+   *
+   * 这是「广播式」通信，和上面 Bridge 演示的「问答式」不同：
+   *   问答式：yoda.invoke(...) → 一次调用一次返回
+   *   广播式：Native 持续 emit，JS 这里持续收
+   *
+   * 一次完整识别会收到 10~50 个事件：
+   *   READY → SPEECH_START → VOLUME × N → PARTIAL × N → SPEECH_END → FINAL
+   *
+   * ★ return speechService.onEvent(...) 的返回值是取消订阅函数，
+   *   useEffect 会在组件卸载时自动调用它 —— 等价于 Android 的 removeObserver
+   */
+  useEffect(() => {
+    return speechService.onEvent(data => {
+      switch (data.status) {
+        case 'READY':
+          setVoiceStatus('listening');
+          setPartialText('');
+          appendLog('🎤 引擎就绪，请说话');
+          break;
+
+        case 'SPEECH_START':
+          appendLog('🗣️ 检测到语音');
+          break;
+
+        case 'VOLUME':
+          // 每 200ms 一次，驱动声波动画
+          setVolume(data.volume ?? 0);
+          break;
+
+        case 'PARTIAL':
+          // ★ 实时字幕：说话过程中文字逐渐变长
+          //   这是系统 SpeechRecognizer 的核心优势，
+          //   参考代码那套「录 aac → 上传服务端」做不到
+          setPartialText(data.text ?? '');
+          break;
+
+        case 'SPEECH_END':
+          setVoiceStatus('recognizing');
+          setVolume(0);
+          appendLog('⏳ 正在做最终识别...');
+          break;
+
+        case 'FINAL':
+          setFinalText(data.text ?? '');
+          setPartialText('');
+          setVoiceStatus('idle');
+          appendLog(`✅ 识别结果: ${data.text}`);
+          // 埋点：记录识别成功和文字长度
+          logger.sendShow({
+            action: 'SPEECH_RESULT',
+            params: { ...getPageLogParams(), textLength: data.text?.length ?? 0 },
+          });
+          break;
+
+        case 'ERROR':
+          setVoiceStatus('idle');
+          setVolume(0);
+          setPartialText('');
+          appendLog(`❌ ${data.message ?? '识别失败'}`);
+          break;
+
+        case 'CANCELLED':
+          setVoiceStatus('idle');
+          setVolume(0);
+          setPartialText('');
+          appendLog('⏹️ 已取消');
+          break;
+      }
+    });
+  }, [appendLog, getPageLogParams]);
+
+  /**
+   * ★ 麦克风按钮点击
+   *   正在录音 → 主动结束（等最终结果）
+   *   空闲     → 申请权限 + 启动识别
+   */
+  const handleVoicePress = useCallback(async () => {
+    if (voiceStatus === 'listening') {
+      appendLog('手动结束录音...');
+      await speechService.stop();
+      return;
+    }
+
+    logger.sendClick({
+      action: 'VOICE_BTN',
+      params: getPageLogParams(),
+    });
+
+    setFinalText('');
+    appendLog('启动语音识别...');
+    const ok = await speechService.start('zh-CN');
+    if (!ok) {
+      appendLog('❌ 启动失败（权限被拒或模块不可用）');
+    }
+  }, [voiceStatus, appendLog, getPageLogParams]);
 
   // ★ Bridge 演示1：调 Native 弹 Toast
   //   KRN 对应：yoda.invoke('live.showToast', { msg: '...' })
@@ -192,6 +302,34 @@ const HelloScreen: React.FC = () => {
           <Text style={styles.infoText}>型号：{deviceInfo.model}</Text>
           <Text style={styles.infoText}>系统：{deviceInfo.os}</Text>
           <Text style={styles.infoText}>App 版本：{deviceInfo.appVersion}</Text>
+        </View>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          ★★★ 语音转文字区 ★★★
+          ═══════════════════════════════════════════════════════════════ */}
+      <View style={styles.divider} />
+      <Text style={styles.sectionTitle}>🎤 语音转文字</Text>
+      <Text style={styles.sectionDesc}>
+        链路：RN → NativeModules.Speech → SpeechRecognizer → 系统识别{'\n'}
+        结果通过 RCTDeviceEventEmitter 实时推回 RN（支持边说边出字）
+      </Text>
+
+      <VoiceButton status={voiceStatus} volume={volume} onPress={handleVoicePress} />
+
+      {/* 实时部分结果（说话过程中，文字逐渐变长）*/}
+      {partialText !== '' && (
+        <View style={styles.voicePartialCard}>
+          <Text style={styles.voicePartialLabel}>实时识别中...</Text>
+          <Text style={styles.voicePartialText}>{partialText}</Text>
+        </View>
+      )}
+
+      {/* 最终识别结果 */}
+      {finalText !== '' && (
+        <View style={styles.voiceResultCard}>
+          <Text style={styles.voiceResultLabel}>✅ 识别结果</Text>
+          <Text style={styles.voiceResultText}>{finalText}</Text>
         </View>
       )}
 
@@ -417,6 +555,47 @@ const styles = StyleSheet.create({
   },
   bottomPadding: {
     height: 40,
+  },
+  // ★ 语音转文字区样式
+  voicePartialCard: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#2d1a3d',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ba68c8',
+    borderStyle: 'dashed',
+  },
+  voicePartialLabel: {
+    fontSize: 11,
+    color: '#ba68c8',
+    marginBottom: 6,
+  },
+  voicePartialText: {
+    fontSize: 15,
+    color: '#e1bee7',
+    lineHeight: 22,
+  },
+  voiceResultCard: {
+    marginHorizontal: 20,
+    marginTop: 10,
+    padding: 14,
+    backgroundColor: '#0d2f1f',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#4caf50',
+  },
+  voiceResultLabel: {
+    fontSize: 12,
+    color: '#66bb6a',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  voiceResultText: {
+    fontSize: 16,
+    color: '#c8e6c9',
+    lineHeight: 24,
   },
   // ★ Native Banner 控制区样式
   bannerRow: {

@@ -2,6 +2,7 @@ package com.example.demo01
 
 import android.app.Application
 import com.example.krn.NativeBannerPackage
+import com.example.krn.SpeechBridgePackage
 import com.example.krn.YodaBridgePackage
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactNativeHost
@@ -15,7 +16,12 @@ class MainApplication : Application(), ReactApplication {
     override val reactNativeHost: ReactNativeHost =
         object : DefaultReactNativeHost(this) {
             override fun getPackages(): List<ReactPackage> =
-                listOf(MainReactPackage(), YodaBridgePackage(), NativeBannerPackage())
+                listOf(
+                    MainReactPackage(),
+                    YodaBridgePackage(),
+                    NativeBannerPackage(),
+                    SpeechBridgePackage()   // ★ 语音识别 Bridge
+                )
 
             override fun getJSMainModuleName(): String = "index"
             override fun getUseDeveloperSupport(): Boolean = false

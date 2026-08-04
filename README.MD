@@ -1610,3 +1610,203 @@ Choreographer 用同步屏障让渲染插队；最终所有指令都汇聚到 Ap
       原因：进程沙箱隔离，不同 App 版本不同，Android 无跨 App 共享第三方 .so 机制。
       Play 商店通过 ABI splitting 只下发对应架构的 .so（APK 从 130MB 降至 ~35MB）。
 
+
+
+---
+
+三十、RN 语音转文字（Native Module 事件通道）
+
+30.1 两种 Bridge 通信模式
+
+    问答式（Request-Response）：适合一次性操作
+      JS:     yoda.invoke('NativeBanner.setColor', { color: '#red' })
+      Kotlin: @ReactMethod fun setColor(json, success, error) {
+                view.setBackgroundColor(...)
+                success.invoke("done")   ← 调用一次，结束
+              }
+
+    广播式（Event Emitter）：适合长流程、多阶段
+      一次语音识别产生 10~50 个事件，Promise 只能 resolve 一次，包不住：
+        READY → SPEECH_START → VOLUME×N → PARTIAL×N → SPEECH_END → FINAL
+
+      Kotlin 发送：
+        reactContext
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+          .emit("SpeechEvent", writableMap)
+
+      JS 监听：
+        const sub = DeviceEventEmitter.addListener('SpeechEvent', cb)
+        sub.remove()   ← 必须能取消，否则组件卸载后泄漏
+
+    类比 Android：
+      问答式 = 普通方法调用
+      广播式 = LocalBroadcastManager / LiveData.observe
+
+30.2 xxxModule 命名的由来
+
+    不是命名习惯，是父类强制：class XxxModule : ReactContextBaseJavaModule
+
+    "Module" 是从 JS 视角起的名字：
+      Kotlin: class SpeechBridgeModule, getName() = "Speech"
+      JS:     NativeModules.Speech.start()
+                            ↑ 挂在 NativeModules 上，成为一个 JS module
+
+    getName() 返回值决定 JS 怎么调，和类名无关。
+
+    三种同名不同义的 Module：
+      Gradle Module — 编译单元（:app / :core / :feature-krn）
+      Native Module — RN Bridge 类（SpeechBridgeModule.kt）
+      JS Module     — 一个 .ts/.tsx 文件（logger.ts）
+
+    Package 是 Module 的容器，类比关系：
+      Module  ≈ 一个 Service 类
+      Package ≈ AndroidManifest.xml 里的 <service> 注册项
+      MainApplication.getPackages() ≈ 整个 AndroidManifest.xml
+
+30.3 三层分层设计
+
+    SpeechRecognizerManager.kt   引擎层：只管识别，完全不知道 RN 存在
+      → 纯 Native 页面也能直接 new 出来用
+    SpeechBridgeModule.kt        翻译层：Kotlin SpeechEvent ↔ JS WritableMap
+      → 不写任何识别逻辑
+    speechService.ts             JS 翻译层：包住 NativeModules / DeviceEventEmitter
+      → 组件不该知道"事件名叫 SpeechEvent"这种细节
+
+    对照 Android MVVM：
+      Manager ≈ Repository / DataSource
+      Module  ≈ ViewModel（转换数据格式）
+      Service ≈ 前端的 Repository
+
+30.4 系统 SpeechRecognizer 用法
+
+    三个核心对象：
+      val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
+      val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+      recognizer.setRecognitionListener(listener)
+      recognizer.startListening(intent)
+
+    Intent 关键配置：
+      EXTRA_LANGUAGE_MODEL = LANGUAGE_MODEL_FREE_FORM  → 自由长句（另一选项 WEB_SEARCH 适合短词）
+      EXTRA_LANGUAGE = "zh-CN"
+      EXTRA_PARTIAL_RESULTS = true    ★ 不加这行 onPartialResults 不触发，没有实时字幕
+      EXTRA_CALLING_PACKAGE = 包名     部分 ROM 强制要求
+
+    RecognitionListener 九个回调：
+      onReadyForSpeech      引擎就绪，可以说话
+      onBeginningOfSpeech   检测到开始说话
+      onRmsChanged(rms)     音量变化，每 100ms 一次（需节流）
+      onEndOfSpeech         检测到说完了（系统自带静音检测，不用自己写计时器）
+      onPartialResults      ★ 实时部分结果，文字逐渐变长
+      onResults             最终结果
+      onError(code)         出错
+      onBufferReceived      原始音频，一般不用
+      onEvent               保留接口
+
+    取文字：
+      bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
+        ↑ 系统返回多个候选，第一个置信度最高
+
+    线程约束：所有方法必须主线程调用，回调也在主线程。
+      @ReactMethod 默认跑在 Native Modules 线程，必须 UiThreadUtil.runOnUiThread { }
+
+30.5 两个必须做的配置
+
+    权限（app/src/main/AndroidManifest.xml）：
+      <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    ★ 包可见性（Android 11+ / API 30 必须）：
+      <queries>
+        <intent>
+          <action android:name="android.speech.RecognitionService" />
+        </intent>
+      </queries>
+
+      不加这个，SpeechRecognizer.isRecognitionAvailable() 在 Android 11+ 永远返回 false。
+      <queries> 是 <manifest> 的直接子元素，不在 <application> 内。
+
+30.6 权限申请放 JS 侧
+
+    Native Module 不是 Activity，拿不到 onRequestPermissionsResult 回调。
+    RN 已内置封装，JS 侧一行搞定：
+
+      const result = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        { title: '需要麦克风权限', buttonPositive: '允许' }
+      )
+
+    Native 侧只做兜底检查：
+      ContextCompat.checkSelfPermission(context, RECORD_AUDIO)
+
+30.7 WritableMap — 给 JS 传数据
+
+    Kotlin 对象不能直接扔给 JS，必须转成 RN 容器：
+      val map = Arguments.createMap()
+      map.putString("status", "PARTIAL")
+      map.putString("text", "今天天气")
+      map.putDouble("volume", 3.5)
+      → JS 收到 { status: 'PARTIAL', text: '今天天气', volume: 3.5 }
+
+    类型对应：
+      putString → string    putInt/putDouble → number
+      putBoolean → boolean  putMap → object   putArray → array
+      注意：JS 无 Int/Long 区分，Long 超过 2^53 会丢精度
+
+30.8 @ReactMethod 参数规则
+
+    Promise 必须是最后一个参数：
+      fun start(options: ReadableMap, promise: Promise)   ✅
+      fun bad(promise: Promise, lang: String)             ❌ 运行时报错
+
+    允许的参数类型只有：
+      String / Boolean / Int / Double / ReadableMap / ReadableArray / Callback / Promise
+      不能传 Kotlin data class
+
+    ReadableMap 取值必须先判断，否则 key 不存在会崩：
+      val lang = if (options.hasKey("lang")) options.getString("lang") else "zh-CN"
+
+    发事件的 Module 必须提供这两个空方法，否则 JS 报警告：
+      @ReactMethod fun addListener(eventName: String) = Unit
+      @ReactMethod fun removeListeners(count: Int) = Unit
+
+30.9 生命周期与内存泄漏
+
+    Kotlin 侧：
+      override fun onCatalystInstanceDestroy() {
+        manager.destroy()   ← RN 实例销毁时释放 SpeechRecognizer
+      }
+
+    JS 侧：
+      useEffect(() => {
+        return speechService.onEvent(handler)   ← 返回值是取消订阅函数
+      }, [handler])
+      // useEffect 的清理函数在组件卸载时自动调用，等价于 Android 的 removeObserver
+
+    反面案例（快手参考代码的真实 Bug）：
+      object AudioRecordSceneManager {
+        private val audioSceneMap = HashMap<String, AudioRecordModule>()
+      }
+      单例 HashMap 持有 FragmentActivity，JS 忘发 cancel 就永久泄漏。
+      正确做法：绑定 RN 实例生命周期，用 ApplicationContext 不持有 Activity。
+
+30.10 参考代码（快手电商）对比与踩坑
+
+    快手 ecommerce/speech 那套只做录音，不做转文字：
+      产出 .aac 文件路径 → JS 自己上传服务端 → 服务端 ASR 返回文字
+    本实现用系统 SpeechRecognizer 直接返回文字，且支持实时 partial。
+
+    从参考代码里学到的三个正确设计（已保留）：
+      1. 三层分层（Bridge 转发 / 管理状态 / 引擎干活）
+      2. 事件驱动而非 Promise 驱动
+      3. 无输入超时保护（5 秒未检测到语音自动取消）
+
+    规避的问题：
+      callback 声明后从不调用 → JS await 永久 pending
+      object 单例 HashMap 持有 Activity → 内存泄漏
+      currentActivity as FragmentActivity 强转 → 可能崩溃
+      状态用 Int 常量 → 改用 sealed class，编译器强制穷举 when 分支
+
+    实测注意：
+      模拟器无语音识别服务，必须真机测试
+      中文识别需要联网
+      快速连点会拿到 ERROR_RECOGNIZER_BUSY，Manager 内部加 isListening 标志防重入
+

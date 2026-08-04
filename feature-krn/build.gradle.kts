@@ -32,6 +32,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    // 语音识别的超时计时器用 Coroutines（参考代码用 RxJava，本项目统一用协程）
+    implementation(libs.kotlinx.coroutines.android)
     // api: 让依赖本 module 的上层也能使用这些类（MainApplication 需要用）
     api("com.facebook.react:react-android:0.73.6")
     api("com.facebook.react:hermes-android:0.73.6")
